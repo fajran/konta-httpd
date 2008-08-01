@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><title>Fungsi-fungsi umum</title><meta name="generator" content="DocBook XSL Stylesheets V1.62.0" /><link rel="home" href="index.html" title="Dokumentasi Tugas 3 Kelompok Konta" /><link rel="up" href="penjelasan_program.html" title="Bab 1. Penjelasan Program" /><link rel="previous" href="cara_kerja_server.html" title="Cara kerja Server" /><link rel="next" href="pengiriman_file.html" title="Pengiriman file ke client" /></head><link rel="stylesheet" type="text/css" href="style.css" /><body><div id="header"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">Fungsi-fungsi umum</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="cara_kerja_server.html">Kembali</a></td><th width="60%" align="center">Bab 1. Penjelasan Program</th><td width="20%" align="right"><a accesskey="n" href="pengiriman_file.html">Lanjut</a></td></tr></table></div></div><div id="content"><div class="section" lang="id" xml:lang="id"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a id="fungsi_umum"></a>Fungsi-fungsi umum</h2></div></div><div></div></div><p>Ada beberapa fungsi-fungsi yang di-share untuk semua bagian pada server, antara
+lain adalah:
+
+</p><div class="orderedlist"><ol type="1"><li><p>Fungsi untuk membaca 1 baris data yang dikirim oleh client (<tt class="function">read_line()</tt>)</p><p>Fungsi ini khusus dibuat karena tidak ada fungsi standar yang disediakan untuk 
+membaca satu baris data. Cara kerja fungsi ini adalah membaca setiap karakter 
+yang dikirimkan sampai ditemukan <tt class="constant">NEWLINE</tt>. Karakter yang bukan <tt class="constant">NEWLINE</tt> akan 
+dimasukkan ke dalam sebuah buffer yang telah ditentukan berapa panjang 
+maksimalnya. Setelah ditemukan <tt class="constant">NEWLINE</tt> atau sudah mencapai panjang maksimal, 
+fungsi ini akan berhenti bekerja dan variabel buffer sudah berisi 
+karakter-karakter yang dikirim, tidak termasuk karakter <tt class="constant">NEWLINE</tt>.</p></li><li><p>Fungsi untuk merapikan Request URI (<tt class="function">bersihkan_path()</tt>)</p><p>Fungsi ini akan membuang karakter-karakter tidak berguna dari Request URI, 
+seperti <tt class="filename">/./</tt>, <tt class="filename">//</tt>, <tt class="filename">/.</tt>, dan <tt class="filename">./</tt>. Jika ditemukan untaian karakter <tt class="filename">/./</tt> atau <tt class="filename">//</tt> maka
+akan diubah menjadi <tt class="filename">/</tt> saja. Jika ditemukan <tt class="filename">/.</tt> pada akhir request URI, maka akan
+diubah menjadi <tt class="filename">/</tt> dan jika <tt class="filename">./</tt> ditemukan pada awal request URI, maka akan diubah
+menjadi <tt class="filename">/</tt>.</p><p>Selain itu, escaped character akan diterjemahkan menjadi bentuk aslinya. 
+Escaped character merupakan representasi sebuah karakter dalam bentuk 
+heksadesimal yang diawali dengan karakter <tt class="literal">%</tt>. Salah satu guna dari escaped 
+character adalah ketika client ingin me-request sebuah file yang mengandung
+karakter spasi. Karena karakter spasi merupakan delimiter dari Request Line, 
+maka karakter spasi harus diubah dahulu menjadi <tt class="literal">%20</tt>. Angka 20 merupakan bilangan
+dengan basis 16 (heksadesimal) yang sama nilainya dengan angka 32 dalam basis
+10 (desimal). Nilai 32 dalam tabel <span class="acronym">ASCII</span> merupakan sebuah karakter spasi.</p></li><li><p>Fungsi untuk menentukan tipe dari sebuah file (<tt class="function">cek_tipe_file()</tt>)</p><p>Fungsi ini berguna untuk mengetahui apakah file yang di-request valid atau 
+tidak. Untuk itu fungsi ini akan mereturn 1 jika file yang direquest memang 
+merupakan regular file dengan fungsi dari linux <tt class="function">IS_REG(m)</tt>. Fungsi ini akan 
+mereturn 2 jika file yang direquest merupakan nama dari directory dengan 
+menggunakan fungsi <tt class="function">IS_DIR(m)</tt>. Jika file yang direquest tidak memenuhi kondisi 
+sebelumnya maka akan mereturn 0. m merupakan variable dengan jenis struct stat.</p><p>Untuk mendapatkan statistik dari file-file dan directory didalamnya maka 
+dipanggil fungsi :
+
+</p><div class="funcsynopsis"><p><code class="funcdef">int <b class="fsfunc">stat</b>(</code><var class="pdparam">fileName</var>, <var class="pdparam">buf</var><code>)</code>;<br />char *<code>fileName</code>;<br />struct stat *<code>buf</code>;</p></div><p>
+
+dengan parameter pertama, merupakan file-file yang berada dalam directory
+relatif tersebut dan parameter kedua pointer dari variabel struct stat.</p><p>Setelah semua statistik dari file yang diminta tersebut didapatkan maka
+fungsi tersebut mencheck jenis file tersebut yang telah dijelaskan di 
+atas.</p></li><li><p>Fungsi untuk mendapatkan tipe dari file yang akan dikirim 
+   (<tt class="function">get_content_type()</tt>)</p><p>Fungsi ini akan mencari content-type yang sesuai dengan ekstensi yang diberikan
+sebagai parameter fungsi. Jika tidak ditemukan, maka content-type default akan
+diberikan.</p></li><li><p>Fungsi untuk mengecek apakah ada program yang menangani jenis file tertentu.</p><p>Fungsi ini akan mencari path program yang menangani suatu jenis file. Contohnya
+adalah file dengan ekstensi <tt class="filename">.php</tt> akan ditangani oleh program <span class="application">PHP</span>. Jika ditemukan
+maka fungsi akan mengeluarkan path program yang bersangkutan, jika tidak maka
+nilai <span class="returnvalue">NULL</span> akan dikeluarkan.</p></li><li><p>Fungsi untuk mengecek apakah client me-request sebuah script.</p><p>Fungsi ini akan mengecek apakah client meminta untuk menjalankan sebuah program.
+Program-program yang dapat dijalankan diletakkan pada sebuah direktori tertentu
+yang dimasukkan dalam sebuah tabel. Daftar direktori ini dapat diatur melalui
+file konfigurasi. Jika client meminta direktori yang ada dalam tabel, maka 
+file yang diminta oleh client akan dianggap menjadi sebuah program, sehingga
+program tersebut harus dijalankan terlebih dahulu. Output dari program akan
+ditangkap oleh server dan dikirimkan ke client.</p></li></ol></div><p>
+
+</p></div></div><div id="footer"><div class="navfooter"><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="cara_kerja_server.html">Kembali</a></td><td width="20%" align="center"><a accesskey="u" href="penjelasan_program.html">Induk</a></td><td width="40%" align="right"><a accesskey="n" href="pengiriman_file.html">Lanjut</a></td></tr><tr><td width="40%" align="left" valign="top">Cara kerja Server</td><td width="20%" align="center"><a accesskey="h" href="index.html">Depan</a></td><td width="40%" align="right" valign="top">Pengiriman file ke client</td></tr></table></div></div></body></html>

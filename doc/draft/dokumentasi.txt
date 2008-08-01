@@ -1,0 +1,609 @@
+
+1. Penjelasan Program
+
+Program yang dibuat dalam tugas 3 kuliah Jaringan Komputer ini adalah sebuah
+program server yang bekerja pada protokol HTTP, atau biasa disebut Web Server.
+
+Web Server akan menerima koneksi dari client dan akan memproses request yang
+dikirim oleh client (HTTP Request). Lalu server akan memproses request yang
+diberikan dan memberikan respon balik ke client (HTTP Response). Pada dasarnya 
+request dari client merupakan request yang meminta sebuah file yang ada pada 
+server, dan server akan mengirimkan file yang diminta kepada client. 
+
+1.1. HTTP Request
+
+Setelah client melakukan koneksi dengan web server, client akan mengirimkan
+HTTP Request. HTTP Request ini terdiri dari tiga bagian, yaitu request line,
+header dan data. Sesuai dengan RFC 2616, request line memiliki format sebagai
+berikut:
+
+Request-Line   = Method SP Request-URI SP HTTP-Version CRLF
+
+Contohnya adalah
+
+GET /index.html HTTP/1.0
+
+Pada tugas kali ini, kami hanya akan memperhatikan request yang memiliki 
+Method GET. Untuk method-method lainnya akan diabaikan dan mengirim pesan
+error kepada client. Bagian lain dari HTTP Request, yaitu header dan data, juga 
+akan diabaikan.
+
+1.2. HTTP Response
+
+Setelah client mengirimkan HTTP Request, server akan memproses request tersebut
+dan akan memberikan tanggapan berupa HTTP Response kepada client. Menurut
+RFC 2616, HTTP Response terdiri dari tiga bagian, yaitu status line, header, 
+dan data. 
+
+Status line berisi keterangan mengenai respon yang server berikan. Format dari
+status line adalah:
+
+Status-Line = HTTP-Version SP Status-Code SP Reason-Phrase CRLF
+
+Status code berisi sebuah angka sepanjang tiga digit yang berisi keterangan 
+mengenai tipe respon yang diberikan oleh server. Ada 5 jenis status code, yaitu:
+1. Informational (1xx)
+2. Success (2xx)
+3. Redirection (3xx)
+4. Client Error (4xx)
+5. Server Error (5xx)
+
+Pada tugas kali ini kami akan mencoba menggunakan beberapa status code, yaitu
+200 (OK), 301 (Move Permanently), 404 (Not Found), 500 (Internal Server Error),
+dan 501 (Not Implemented).
+
+Status code 200 akan diberikan ketika server berhasil memproses request yang 
+diberikan oleh client dan server akan mengirim data yang diminta oleh client.
+Status code 301 diberikan ketika client me-request sebuah file yang ternyata
+berupa direktori. Server akan memerintahkan client untuk mengubah request
+untuk meminta direktori tersebut. Status code 404 akan diberikan oleh server
+ketika client meminta file yang tidak ada pada server. Server akan memberikan
+status code 500 ketika terjadi kesalahan internal pada server. Sedangkan status
+code 501 akan diberikan ketika client menggunakan request method selain GET.
+
+1.3. Cara kerja Server
+
+Pada dasarnya cara kerja server adalah menerjemahkan request yang dikirimkan
+oleh client dan memberikan response yang sesuai dengan request tersebut.
+
+Saat server dihidupkan, server akan membaca file konfigurasi, lalu membuat soket 
+dan mulai menerima koneksi dari soket tersebut. Lalu tahapan-tahapan yang akan 
+terjadi adalah:
+1. Server menerima koneksi
+2. Fungsi yang menangani koneksi akan dipanggil
+3. Baris pertama request (Request Line) akan diambil dan diproses
+4. Field Method, Request URI, dan HTTP-Version akan dipisahkan dari Request 
+   Line tersebut.
+5. Server akan menerjemahkan Request URI tersebut menjadi path sebenarnya
+   pada harddisk server.
+6. Server akan mengirim status code 200, mengecek tipe file dan mengirimkan
+   file tersebut ke client.
+7. Koneksi diputus.
+
+Kemungkinan-kemungkinan lain yang mungkin ada adalah, jika file yang diminta
+ternyata sebuah direktori. Pada kondisi ini, server akan mengirimkan status
+code 301 beserta lokasi sebenarnya direktori tersebut ke client.
+
+Jika client meminta sebuah direktori tanpa menyatakan file apa yang akan 
+ditampilkan, server akan mencari file-file indeks pada direktori tersebut.
+Jika ditemukan, server akan mengirim file tersebut, dan jika tidak isi direktori
+akan ditampilkan.
+
+Client bisa saja meminta sebuah file yang tidak valid. Jika menemui
+kondisi seperti ini, server akan memberitahu client bahwa file yang diminta
+tidak valid dengan memberikan status code 404.
+
+Selain itu jika client me-request sebuah file yang berada dalam direktori 
+khusus script. File yang berada dalam direktori ini akan dianggap sebagai 
+sebuah program. Program akan dieksekusi oleh server dan output dari program
+tersebut akan dikirim ke client.
+
+Jika client meminta file yang memiliki program khusus untuk memprosesnya,
+maka server akan menjalankan program tersebut dan output dari program akan 
+dikirim ke client.
+
+1.4 Fungsi-fungsi umum
+
+Ada beberapa fungsi-fungsi yang di-share untuk semua bagian pada server, antara
+lain adalah
+
+1. Fungsi untuk membaca 1 baris data yang dikirim oleh client (read_line())
+
+Fungsi ini khusus dibuat karena tidak ada fungsi standar yang disediakan untuk 
+membaca satu baris data. Cara kerja fungsi ini adalah membaca setiap karakter 
+yang dikirimkan sampai ditemukan NEWLINE. Karakter yang bukan NEWLINE akan 
+dimasukkan ke dalam sebuah buffer yang telah ditentukan berapa panjang 
+maksimalnya. Setelah ditemukan NEWLINE atau sudah mencapai panjang maksimal, 
+fungsi ini akan berhenti bekerja dan variabel buffer sudah berisi 
+karakter-karakter yang dikirim, tidak termasuk karakter NEWLINE.
+
+2. Fungsi untuk merapikan Request URI (bersihkan_path())
+
+Fungsi ini akan membuang karakter-karakter tidak berguna dari Request URI, 
+seperti /./, //, /., dan ./. Jika ditemukan untaian karakter /./ atau // maka
+akan diubah menjadi / saja. Jika ditemukan /. pada akhir request URI, maka akan
+diubah menjadi / dan jika ./ ditemukan pada awal request URI, maka akan diubah
+menjadi /.
+
+Selain itu, escaped character akan diterjemahkan menjadi bentuk aslinya. 
+Escaped character merupakan representasi sebuah karakter dalam bentuk 
+heksadesimal yang diawali dengan karakter %. Salah satu guna dari escaped 
+character adalah ketika client ingin me-request sebuah file yang mengandung
+karakter spasi. Karena karakter spasi merupakan delimiter dari Request Line, 
+maka karakter spasi harus diubah dahulu menjadi %20. Angka 20 merupakan bilangan
+dengan basis 16 (heksadesimal) yang sama nilainya dengan angka 32 dalam basis
+10 (desimal). Nilai 32 dalam tabel ASCII merupakan sebuah karakter spasi.
+
+3. Fungsi untuk menentukan tipe dari sebuah file (cek_tipe_file())
+
+Fungsi ini berguna untuk mengetahui apakah file yang di-request valid atau 
+tidak. Untuk itu fungsi ini akan mereturn 1 jika file yang direquest memang 
+merupakan regular file dengan fungsi dari linux IS_REG(m). Fungsi ini akan 
+mereturn 2 jika file yang direquest merupakan nama dari directory dengan 
+menggunakan fungsi IS_DIR(m). Jika file yang direquest tidak memenuhi kondisi 
+sebelumnya maka akan mereturn 0.
+m merupakan variable dengan jenis struct stat.
+
+Untuk mendapatkan statistik dari file-file dan directory didalamnya maka 
+dipanggil fungsi :
+
+int stat(char* fileName, struct stat *buf);
+
+dengan parameter pertama, merupakan file-file yang berada dalam directory
+relatif tersebut dan parameter kedua pointer dari variabel struct stat.
+
+Setelah semua statistik dari file yang diminta tersebut didapatkan maka
+fungsi tersebut mencheck jenis file tersebut yang telah dijelaskan di 
+atas.
+
+4. Fungsi untuk mendapatkan tipe dari file yang akan dikirim 
+   (get_content_type())
+
+Fungsi ini akan mencari content-type yang sesuai dengan ekstensi yang diberikan
+sebagai parameter fungsi. Jika tidak ditemukan, maka content-type default akan
+diberikan.
+
+5. Fungsi untuk mengecek apakah ada program yang menangani jenis file tertentu.
+
+Fungsi ini akan mencari path program yang menangani suatu jenis file. Contohnya
+adalah file dengan ekstensi .php akan ditangani oleh program php. Jika ditemukan
+maka fungsi akan mengeluarkan path program yang bersangkutan, jika tidak maka
+nilai NULL akan dikeluarkan.
+
+6. Fungsi untuk mengecek apakah client me-request sebuah script.
+
+Fungsi ini akan mengecek apakah client meminta untuk menjalankan sebuah program.
+Program-program yang dapat dijalankan diletakkan pada sebuah direktori tertentu
+yang dimasukkan dalam sebuah tabel. Daftar direktori ini dapat diatur melalui
+file konfigurasi. Jika client meminta direktori yang ada dalam tabel, maka 
+file yang diminta oleh client akan dianggap menjadi sebuah program, sehingga
+program tersebut harus dijalankan terlebih dahulu. Output dari program akan
+ditangkap oleh server dan dikirimkan ke client.
+
+1.5. Pengiriman file ke client
+
+
+
+1.6. Pembuatan daftar isi direktori
+
+Setelah path dalam secondary storage dan URL disingkronisasi, maka fungsi ini 
+akan dieksekusi, jika file yang direquest oleh user melalui URL tidak ada 
+didalam direktori relatif halaman web tersebut. Maka yang akan kemudian 
+dilakukan oleh sistem webserver ini adalah mengeluarkan isi didalam direktori 
+relatif tersebut untuk kemudian ditampikan dalam user browser.Sehingga user bisa 
+melihat file-file maupun direktori berserta statistiknya (file size, dan last 
+modified) yang berada dalam direktori relatif halaman web tersebut, dan kemudian
+user bisa memilih file mana yang inginkan. 
+
+Pada saat sistem webserver mengetahui bahwa file yang di-request oleh user 
+melalui URL tidak ada didalam direkori relatif halaman web tersebut, maka sistem 
+webserver akan memanggil fungsi: 
+
+DIR *opendir(const char *name);
+
+dengan parameter, relatif path tersebut didalam secondary storage server. Dan 
+akan mereturn DIR* yang merupakan deskripsi mengenai direktori tersebut. 
+Kemudian webserver akan memanggil fungsi:
+
+struct dirent *readdir(DIR *dir);
+
+dengan parameter variabel DIR* yang didapatkan ketika sistem memanggil fungsi 
+diatas. Fungsi ini akan me-return struct dirent*. Selama struct dirent* ini 
+tidak men-return NULL, maka sistem medapatkan semua isi file-file dan direktori 
+didalamnya, dan ketika struct dirent* me-return NULL, maka semua isi didalam 
+direktori telah selesai dibaca. Ketika setiap file atau direktori telah didapat 
+ketika memanggil fungsi ini melalui variabel struct dirent*, maka statistik dari 
+file-file dan direktori didalam nya bisa didapatkan dengan memanggil fungsi:
+
+int stat(const char *file_name, struct stat *buf);
+
+dengan parameter pertama file-file yang berada didalam direktori relatif 
+tersebut, dan parameter kedua adalah pointer dari variabel strut stat. Setelah 
+semua statistik dari file-file dan direktori didalamnya didapatkan, maka semua 
+fileNama, beserta statistiknya diembed kedalam file html dan dikirimkan ke user 
+browser. Ketika semuanya selesai dilakukan, maka langkah selanjutnya adalah 
+menutup direktori tersebut dengan memanggil fungsi:
+
+int closedir(DIR *dir);
+
+dengan parameter variabel DIR* yang didapat ketika membuka direktori dengan 
+fungsi opendir diatas.
+
+Agar file dalam direktori dapat dilihat dengan nyaman, isi direktori ditampilkan
+dalam format HTML yang kemudian akan dikirim ke client.
+
+1.7. Dynamic Content
+
+Server yang kami buat dapat diatur untuk memproses dynamic content melalui dua
+cara, yaitu:
+1. Menjalakan program yang ada dalam direktori-direktori yang ditentukan oleh
+   ScriptAlias dalam file konfigurasi.
+2. Menjalakan program tertentu karena client meminta file dengan tipe tertentu.
+
+Kami mencoba mengimplementasikan sebagian dari protokol CGI untuk memanggil
+program yang diinginkan.
+
+Tahapan yang terjadi saat server ingin menjalankan program lain adalah:
+1. Membuat environment variabel yang mengandung informasi server, file yang
+   dijalankan, Request Method, dan sebagainya.
+2. Membuat pipa antara dua buah file descriptor dengan menggunakan fungsi pipe()
+3. Membuat proses baru dengan menggunakan fungsi fork()
+4. Pada proses anak, tahapan yang terjadi adalah:
+   1. File descriptor pipa untuk menulis diduplikasikan dengan standard output 
+      proses tersebut, sehingga standard output proses beralih ke file 
+	  descriptor pipa.
+   2. Kedua buah file descriptor pipa ditutup.
+   3. Program dieksekusi dengan menggunakan fungsi execle().
+5. Pada proses asli, tahapan yang terjadi adalah:
+   1. File descriptor pipa untuk menulis ditutup.
+   2. Dilakukan pembacaan file descriptor pipa dan data yang diterima langsung
+      dikirimkan ke client.
+
+Saat proses membuat pipa, maka akan didapatkan dua buah file descriptor yaitu file
+descriptor untuk mengirim data dan menerima data.
+
+ +----| proses 1 |----+
+ |                    |
+ +-->---| pipa |--->--+
+ 
+Saat proses membuat proses baru, maka akan ada dua buah proses yang terhubung
+ke dalam satu buah pipa yang sama
+
+ +-----| proses 1 |-----+
+ |                      |
+ | +---| proses 2 |---+ |
+ | |                  | |
+ | +->---|      |--->-+ |
+ |       | pipa |       |
+ +--->---|      |--->---+
+
+Proses 1 dapat menutup file descriptor untuk menulis dan Proses 2 dapat menutup
+file descriptor untuk membaca
+
+       | proses 1 |-----+
+                        |
+   +---| proses 2 |     |
+   |                    |
+   +->---|      |       |
+         | pipa |       |
+         |      |--->---+
+
+Sehingga antara Proses 1 dan Proses 2 dapat saling berkomunikasi melalui pipa 
+tersebut.
+
+Kemudian Proses 2 mengalihkan file descriptor untuk menulis tersebut menjadi
+standard output milik Proses 2. Sehingga jika Proses 2 mengeluarkan output
+melalui standard output, maka Proses 1 dapat menangkap output tersebut.
+
+Selanjutnya, Proses 1 dapat mengirimkan data dari Proses 2 ke client.
+
+ >-- data dari proses 2 -->--| proses 1 |-->-- socket ke client -->
+  
+  
+2. Batasan Program dan Asumsi
+
+Asumsi yang kami pakai dalam pengerjaan tugas kali ini adalah
+1. Tidak ada banyak client yang melakukan koneksi secara simultan.
+2. Program yang dijalankan oleh server saat memproses dynamic content akan 
+   berjalan dengan normal dan tidak meninggalkan error apapun.
+3. Client akan melakukan request secara normal.
+
+Program ini memiliki keterbatasan-keterbatasan, antara lain
+1. Tidak bisa melakukan pemutusan koneksi secara otomatis setelah beberapa
+   waktu tertentu (ada timeout koneksi)
+2. Server melakukan fork() setiap ada koneksi yang masuk. Jika ada banyak 
+   koneksi secara simultan maka beban server akan meningkat.
+
+
+3. Kemungkinan Pengembangan Program
+
+Program yang kami buat masih mungkin dikembangkan lebih lanjut, antara lain:
+1. Penggunaan thread yang lebih ringan daripada pembuatan proses baru saat ada
+   koneksi yang masuk.
+2. Pengaturan timeout setiap koneksi yang masuk.
+3. Penanganan persistent connection/multiple request dalam satu buah koneksi.
+
+4. Manual Penggunaan Program
+
+Agar program bisa digunakan, pastikan Anda telah mengkompilasi source code 
+program menjadi sebuah file yang dapat dijalankan. Setelah source code 
+dikompilasi, barulah Anda dapat menjalankan dan menggunakan program.
+
+4.1. Kompilasi
+
+Program yang kami buat kami lengkapi dengan file Makefile sehingga program make 
+dapat digunakan untuk mempermudah melakukan kompilasi.
+
+Contoh:
+
+$ make
+  [CC]     konta-httpd.o
+  [CC]     readdir.o
+  [CC]     util.o
+  [CC]     config.o
+  [CC]     request-handler.o
+  [CC]     cgi.o
+  [CC]     response.o
+  [LINK]   konta-httpd
+
+Setelah source code dikompilasi, maka akan ada file konta-httpd yang merupakan
+file binary dari program. 
+
+4.2. Konfigurasi server
+
+Program yang kami buat dapat dikonfigurasi dari luar program sehingga tidak
+perlu melakukan kompilasi ulang ketika ingin mengubah konfigurasi. Konfigurasi
+dilakukan melalui sebuah file bernama conf/konta-httpd.conf
+
+Keterangan mengenai file konfigurasi dapat dibaca pada lampiran.
+
+4.3. Menjalankan server
+
+Untuk menjalakankan program server, cukup panggil program server yang terbentuk 
+dari hasil kompilasi.
+
+Contoh:
+
+$ ./konta-httpd
+Konta-HTTP Server running on port 8000...
+
+Setelah server berjalan, Anda bisa mencoba mengakses server melalui browser
+kesayangan Anda.
+
+Secara default, direktori dokumen html ada pada direktori htdocs/. Anda dapat 
+meletakkan beberapa file yang dapat Anda gunakan untuk mencoba server kami ini.
+
+
+5. Contoh Eksekusi
+
+Dalam demo program ini, server dikonfigurasi dengan file konfigurasi seperti
+di bawah ini
+
+ServerPort 29182
+DocumentRoot htdocs/
+DirectoryIndex index.html
+AddType text/html .html
+AddType image/png .png
+AddType application/x-httpd-php .php
+DefaultType text/plain
+Action application/x-httpd-php /usr/lib/cgi-bin/php4
+ScriptAlias /cgi-bin/ cgi-bin/
+
+Isi dari direktori htdocs/ adalah
+
+index.html
+direktori/
+direktori/index.htm
+phpinfo.php
+gambar/gambar.png
+teks.txt
+
+Isi cgi-bin/ adalah
+
+adder.sh
+
+Isi dari file index.html adalah
+
+<html><body>
+<h1>Selamat datang!</h1>
+<p>Server ini menggunakan Konta-HTTP Server</p>
+</body></html>
+
+Isi dari file direktori/index.htm
+
+<html><body>
+<p>Ini adalah file index.htm yang berada dalam direktori direktori/</p>
+</body></html>
+
+Isi dari file phpinfo.php 
+
+<? phpinfo(); ?>
+
+Isi dari adder.sh 
+
+#!/bin/sh
+
+vars=`echo $QUERY_STRING | sed s/\&/\ /g`
+vars=( $vars )
+                                                                                
+num1=${vars[0]}
+num2=${vars[1]}
+                                                                                
+echo -n -e "Content-type: text/plain\r\n"
+echo -n -e "\r\n"
+                                                                                
+echo -n -e "Bilangan pertama: $num1\n"
+echo -n -e "Bilangan kedua  : $num2\n"
+                                                                                
+jumlah=$(( $num1 + $num2 ))
+                                                                                
+echo -n -e "Jumlah          : $jumlah\n"
+
+
+
+
+
+6. Referensi
+
+Referensi yang kami gunakan dalam mengerjakan tugas 3 kuliah Jaringan Komputer
+ini adalah:
+1. RFC 2616 (HTTP 1.1)
+2. Source code Apache/1.3.27 (http://httpd.apache.org)
+3. Source code jbdhttpd/0.1.0 (http://tinyhtttpd.sourceforge.net)
+4. Source code Null httpd 0.5.1
+5. Beej's Guide to Network Programming
+
+dan sumber-sumber lain yang kami temukan.
+
+
+Lampiran
+
+A. File Konfigurasi
+
+Server yang kami buat dapat dikonfigurasi melalui sebuah file konfigurasi
+conf/konta-httpd.conf. Setiap konfigurasi suatu bagian tertentu ditulis dalam
+satu baris. Setiap baris konfigurasi memiliki format sebagai berikut
+
+Nama Nilai
+
+Nama menentukan hal yang ingin dikonfigurasi. Nilai adalah nilai dari hal 
+tersebut.
+
+Daftar hal-hal yang dapat dikonfigurasi adalah
+1. ServerPort
+   Menentukan port dari server
+   
+   Format:
+   
+   ServerPort port
+   
+   Contoh:
+   
+   ServerPort 8000
+   
+2. DocumentRoot
+   Direktori yang dimasukkan akan menjadi direktori teratas pada Request URI.
+   
+   Format:
+   
+   DocumentRoot /path/menuju/sebuah/direktori
+   
+   Contoh:
+   
+   DocumentRoot /var/www/html
+   
+3. DirectoryIndex
+   Menentukan file-file apa saja yang dapat menjadi indeks sebuah direktori
+   
+   Format:
+   
+   DirectoryIndex file1 file2 ...
+   
+   Contoh:
+   
+   DirectoryIndex index.html index.htm index.php
+   
+4. AddType
+   Menambahkan tipe sebuah file tertentu berdasarkan ekstensinya.
+   
+   Format:
+   
+   AddType content/type .ekstensi
+   
+   Contoh:
+   
+   AddType text/html .html
+   AddType text/html .htm
+   AddType application/x-httpd-php .php
+
+5. DefaultType
+   Mengatur tipe yang akan dikirim jika tipe untuk file tertentu tidak 
+   ditemukan.
+   
+   Format:
+   
+   DefaultType content/type
+   
+   Contoh:
+   
+   DefaultType text/plain
+   
+6. Action
+   Mengatur program yang akan dipanggil jika client meminta file dengan tipe
+   tertentu
+   
+   Format:
+   
+   Action content/type /path/menuju/sebuah/program
+   
+   Contoh:
+   
+   Action application/x-httpd-php /usr/bin/php
+
+
+7. ScriptAlias
+   Mengatur direktori virtual yang akan dijadikan sebagai tempat meletakkan
+   program-program yang dapat dipanggil.
+   
+   Format:
+   
+   ScriptAlias /direktori-virtual/ /path/menuju/direktori/sebenarnya/
+   
+   Contoh:
+   
+   ScriptAlias /cgi-bin/ /var/www/cgi-bin/
+   
+8. ServerRoot
+   Mengatur direktori utama server berada. Jika direktori pada ScriptAlias dan
+   DocumentRoot merupakan direktori relatif (tidak menggunakan / pada awal
+   direktori), maka direktori server ini akan ditambahkan pada awal direktori
+   ScriptAlias atau DocumentRoot tersebut.
+   
+   Format:
+   
+   ServerRoot /path/menuju/sebuah/direktori/
+   
+   Contoh:
+   
+   ServerRoot /usr/local/konta-httpd/
+   
+A.1. Contoh file konfigurasi
+
+Contoh file konfigurasi:
+
+# File konfigurasi Konta-HTTPd 
+
+# Cara penggunaan:
+# 1. Gunakan tanda pagar pada awal baris untuk membuat komentar
+# 2. Pisahkan kata/token dengan 1 spasi
+
+# Port yang dipakai oleh server
+ServerPort 8000
+
+# Direktori tempat dokumen html berada
+DocumentRoot htdocs/
+
+# Nama file yang dicari jika client me-request sebuah direktori
+DirectoryIndex index.html index.htm index.php
+
+# Tambahkan Content-Type
+AddType text/plain .txt
+AddType text/html .html
+AddType text/html .htm
+AddType text/css .css
+AddType image/jpeg .jpg
+AddType image/jpeg .jpeg
+AddType image/gif .gif
+AddType image/png .png
+AddType application/x-httpd-php .php
+AddType application/x-httpd-sh .sh
+
+# Content-Type default jika tidak ada yang cocok
+DefaultType text/plain
+
+# Handler untuk tipe file tertentu
+Action application/x-httpd-php /usr/lib/cgi-bin/php4
+Action application/x-httpd-sh /bin/sh
+
+# Script Alias
+ScriptAlias /cgi-bin/ cgi-bin/

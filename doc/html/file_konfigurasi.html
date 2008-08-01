@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><title>Lampiran A. File Konfigurasi</title><meta name="generator" content="DocBook XSL Stylesheets V1.62.0" /><link rel="home" href="index.html" title="Dokumentasi Tugas 3 Kelompok Konta" /><link rel="up" href="index.html" title="Dokumentasi Tugas 3 Kelompok Konta" /><link rel="previous" href="referensi.html" title="Bab 6. Referensi" /></head><link rel="stylesheet" type="text/css" href="style.css" /><body><div id="header"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">Lampiran A. File Konfigurasi</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="referensi.html">Kembali</a></td><th width="60%" align="center"></th><td width="20%" align="right"></td></tr></table></div></div><div id="content"><div class="appendix" lang="id" xml:lang="id"><div class="titlepage"><div><div><h2 class="title"><a id="file_konfigurasi"></a>Lampiran A. File Konfigurasi</h2></div></div><div></div></div><div class="toc"><p><b>Daftar Isi</b></p><dl><dt><span class="section"><a href="file_konfigurasi.html#contoh_file_konfigurasi">Contoh file konfigurasi</a></span></dt></dl></div><p>Server yang kami buat dapat dikonfigurasi melalui sebuah file konfigurasi
+<tt class="filename">conf/konta-httpd.conf</tt>. Setiap konfigurasi suatu bagian tertentu ditulis dalam
+satu baris. Setiap baris konfigurasi memiliki format sebagai berikut:
+
+</p><pre class="screen">
+Nama Nilai
+</pre><p>
+</p><p><tt class="varname">Nama</tt> menentukan hal yang ingin dikonfigurasi. <tt class="varname">Nilai</tt> adalah nilai dari hal 
+tersebut.</p><p>Daftar hal-hal yang dapat dikonfigurasi adalah:
+</p><div class="orderedlist"><ol type="1"><li><p><tt class="varname">ServerPort</tt></p><p>Menentukan port dari server</p><p>Format:
+   
+</p><pre class="screen">
+<tt class="varname">ServerPort</tt> port
+</pre><p>
+   </p><p>Contoh:
+   
+</p><pre class="screen">
+<tt class="varname">ServerPort</tt> 8000
+</pre><p>
+   </p></li><li><p><tt class="varname">DocumentRoot</tt></p><p>Direktori yang dimasukkan akan menjadi direktori teratas pada Request URI.</p><p>Format:
+   
+</p><pre class="screen">
+<tt class="varname">DocumentRoot</tt> /path/menuju/sebuah/direktori
+</pre><p>
+   </p><p>Contoh:
+   
+</p><pre class="screen">
+<tt class="varname">DocumentRoot</tt> /var/www/html
+</pre><p>
+   </p></li><li><p><tt class="varname">DirectoryIndex</tt></p>
+   Menentukan file-file apa saja yang dapat menjadi indeks sebuah direktori
+   
+   <p>Format:
+   
+</p><pre class="screen">
+<tt class="varname">DirectoryIndex</tt> file1 file2 ...
+</pre><p>
+   </p><p>Contoh:
+   
+</p><pre class="screen">
+<tt class="varname">DirectoryIndex</tt> index.html index.htm index.php
+</pre><p>
+   </p></li><li><p><tt class="varname">AddType</tt></p>
+   Menambahkan tipe sebuah file tertentu berdasarkan ekstensinya.
+   
+   <p>Format:
+   
+</p><pre class="screen">
+<tt class="varname">AddType</tt> content/type .ekstensi
+</pre><p>
+   </p><p>Contoh:
+   
+</p><pre class="screen">
+<tt class="varname">AddType</tt> text/html .html
+<tt class="varname">AddType</tt> text/html .htm
+<tt class="varname">AddType</tt> application/x-httpd-php .php
+</pre><p>
+   </p></li><li><p><tt class="varname">DefaultType</tt></p>
+   Mengatur tipe yang akan dikirim jika tipe untuk file tertentu tidak 
+   ditemukan.
+   
+   <p>Format:
+   
+</p><pre class="screen">
+<tt class="varname">DefaultType</tt> content/type
+</pre><p>
+	</p><p>Contoh:
+   
+</p><pre class="screen">
+<tt class="varname">DefaultType</tt> text/plain
+</pre><p>
+   </p></li><li><p><tt class="varname">Action</tt></p>
+   Mengatur program yang akan dipanggil jika client meminta file dengan tipe
+   tertentu
+   
+   <p>Format:
+   
+</p><pre class="screen">
+<tt class="varname">Action</tt> content/type /path/menuju/sebuah/program
+</pre><p>
+   </p><p>Contoh:
+
+</p><pre class="screen">
+<tt class="varname">Action</tt> application/x-httpd-php /usr/bin/php
+</pre><p>
+   </p></li><li><p><tt class="varname">ScriptAlias</tt></p>
+   Mengatur direktori virtual yang akan dijadikan sebagai tempat meletakkan
+   program-program yang dapat dipanggil.
+   
+   <p>Format:
+   
+</p><pre class="screen">
+<tt class="varname">ScriptAlias</tt> /direktori-virtual/ /path/menuju/direktori/sebenarnya/
+</pre><p>
+   </p><p>Contoh:
+   
+</p><pre class="screen">
+<tt class="varname">ScriptAlias</tt> /cgi-bin/ /var/www/cgi-bin/
+</pre><p>
+   </p></li><li><p><tt class="varname">ServerRoot</tt></p>
+   Mengatur direktori utama server berada. Jika direktori pada ScriptAlias dan
+   DocumentRoot merupakan direktori relatif (tidak menggunakan / pada awal
+   direktori), maka direktori server ini akan ditambahkan pada awal direktori
+   ScriptAlias atau DocumentRoot tersebut.
+   
+   <p>Format:
+   
+</p><pre class="screen">
+<tt class="varname">ServerRoot</tt> /path/menuju/sebuah/direktori/
+</pre><p>
+   </p><p>Contoh:
+   
+</p><pre class="screen">
+<tt class="varname">ServerRoot</tt> /usr/local/konta-httpd/
+</pre><p>
+   </p></li></ol></div><p>
+</p><div class="section" lang="id" xml:lang="id"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a id="contoh_file_konfigurasi"></a>Contoh file konfigurasi</h2></div></div><div></div></div><p>Contoh file konfigurasi:
+	
+</p><pre class="screen">
+# File konfigurasi Konta-HTTPd 
+
+# Cara penggunaan:
+# 1. Gunakan tanda pagar pada awal baris untuk membuat komentar
+# 2. Pisahkan kata/token dengan 1 spasi
+
+# Port yang dipakai oleh server
+ServerPort 8000
+
+# Direktori tempat dokumen html berada
+DocumentRoot htdocs/
+
+# Nama file yang dicari jika client me-request sebuah direktori
+DirectoryIndex index.html index.htm index.php
+
+# Tambahkan Content-Type
+AddType text/plain .txt
+AddType text/html .html
+AddType text/html .htm
+AddType text/css .css
+AddType image/jpeg .jpg
+AddType image/jpeg .jpeg
+AddType image/gif .gif
+AddType image/png .png
+AddType application/x-httpd-php .php
+AddType application/x-httpd-sh .sh
+
+# Content-Type default jika tidak ada yang cocok
+DefaultType text/plain
+
+# Handler untuk tipe file tertentu
+Action application/x-httpd-php /usr/lib/cgi-bin/php4
+Action application/x-httpd-sh /bin/sh
+
+# Script Alias
+ScriptAlias /cgi-bin/ cgi-bin/
+</pre><p>
+	
+	</p></div></div></div><div id="footer"><div class="navfooter"><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="referensi.html">Kembali</a></td><td width="20%" align="center"><a accesskey="u" href="index.html">Induk</a></td><td width="40%" align="right"></td></tr><tr><td width="40%" align="left" valign="top">Bab 6. Referensi</td><td width="20%" align="center"><a accesskey="h" href="index.html">Depan</a></td><td width="40%" align="right" valign="top"></td></tr></table></div></div></body></html>

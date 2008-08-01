@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><title>Dynamic Content</title><meta name="generator" content="DocBook XSL Stylesheets V1.62.0" /><link rel="home" href="index.html" title="Dokumentasi Tugas 3 Kelompok Konta" /><link rel="up" href="penjelasan_program.html" title="Bab 1. Penjelasan Program" /><link rel="previous" href="daftar_isi_direktori.html" title="Pembuatan daftar isi direktori" /><link rel="next" href="batasan_program_dan_asumsi.html" title="Bab 2. Batasan Program dan Asumsi" /></head><link rel="stylesheet" type="text/css" href="style.css" /><body><div id="header"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">Dynamic Content</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="daftar_isi_direktori.html">Kembali</a></td><th width="60%" align="center">Bab 1. Penjelasan Program</th><td width="20%" align="right"><a accesskey="n" href="batasan_program_dan_asumsi.html">Lanjut</a></td></tr></table></div></div><div id="content"><div class="section" lang="id" xml:lang="id"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a id="dynamic_content"></a>Dynamic Content</h2></div></div><div></div></div><p>Server yang kami buat dapat diatur untuk memproses dynamic content melalui dua
+cara, yaitu:
+</p><div class="orderedlist"><ol type="1"><li><p>Menjalakan program yang ada dalam <tt class="varname">ScriptAlias</tt>.</p></li><li><p>Menjalakan program tertentu karena client meminta file dengan tipe tertentu.</p></li></ol></div><p>
+</p><p>Kami mencoba mengimplementasikan sebagian dari protokol CGI untuk memanggil
+program yang diinginkan.</p><p>Tahapan yang terjadi saat server ingin menjalankan program lain adalah:
+</p><div class="orderedlist"><ol type="1"><li><p>Membuat environment variabel yang mengandung informasi server, file yang
+   dijalankan, Request Method, dan sebagainya.</p></li><li><p>Membuat pipa antara dua buah file descriptor dengan menggunakan fungsi <tt class="function">pipe()</tt>.</p></li><li><p>Membuat proses baru dengan menggunakan fungsi <tt class="function">fork()</tt>.</p></li><li><p>Pada proses anak, tahapan yang terjadi adalah:
+	</p><div class="orderedlist"><ol type="a"><li><p>File descriptor pipa untuk menulis diduplikasikan dengan standard output 
+	proses tersebut, sehingga standard output proses beralih ke file 
+	descriptor pipa.</p></li><li><p>Kedua buah file descriptor pipa ditutup.</p></li><li><p>Program dieksekusi dengan menggunakan fungsi <tt class="function">execle()</tt>.</p></li></ol></div><p>
+	</p></li><li><p>Pada proses asli, tahapan yang terjadi adalah:
+	</p><div class="orderedlist"><ol type="a"><li><p>File descriptor pipa untuk menulis ditutup.</p></li><li><p>Dilakukan pembacaan file descriptor pipa dan data yang diterima langsung
+      dikirimkan ke client.</p></li></ol></div><p>
+	</p></li></ol></div><p>
+</p><p>Saat proses membuat pipa, maka akan didapatkan dua buah file descriptor yaitu file
+descriptor untuk mengirim data dan menerima data.</p><pre class="screen">
+
+    +----| proses 1 |----+
+    |                    |
+    +--&gt;---| pipa |---&gt;--+
+
+</pre><p>Saat proses membuat proses baru, maka akan ada dua buah proses yang terhubung
+ke dalam satu buah pipa yang sama.</p><pre class="screen">
+
+    +-----| proses 1 |-----+
+    |                      |
+    | +---| proses 2 |---+ |
+    | |                  | |
+    | +-&gt;---|      |---&gt;-+ |
+    |       | pipa |       |
+    +---&gt;---|      |---&gt;---+
+
+</pre><p>Proses 1 dapat menutup file descriptor untuk menulis dan Proses 2 dapat menutup
+file descriptor untuk membaca.</p><pre class="screen">
+
+          | proses 1 |-----+
+                           |
+      +---| proses 2 |     |
+      |                    |
+      +-&gt;---|      |       |
+            | pipa |       |
+            |      |---&gt;---+
+
+</pre><p>Sehingga antara Proses 1 dan Proses 2 dapat saling berkomunikasi melalui pipa 
+tersebut.</p><p>Kemudian Proses 2 mengalihkan file descriptor untuk menulis tersebut menjadi
+standard output milik Proses 2. Sehingga jika Proses 2 mengeluarkan output
+melalui standard output, Proses 1 dapat menangkap output tersebut.</p><p>Selanjutnya, Proses 1 dapat mengirimkan data dari Proses 2 ke client.</p><pre class="screen">
+
+    &gt;-- data dari proses 2 --&gt;--| proses 1 |--&gt;-- socket ke client --&gt;
+
+</pre></div></div><div id="footer"><div class="navfooter"><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="daftar_isi_direktori.html">Kembali</a></td><td width="20%" align="center"><a accesskey="u" href="penjelasan_program.html">Induk</a></td><td width="40%" align="right"><a accesskey="n" href="batasan_program_dan_asumsi.html">Lanjut</a></td></tr><tr><td width="40%" align="left" valign="top">Pembuatan daftar isi direktori</td><td width="20%" align="center"><a accesskey="h" href="index.html">Depan</a></td><td width="40%" align="right" valign="top">Bab 2. Batasan Program dan Asumsi</td></tr></table></div></div></body></html>

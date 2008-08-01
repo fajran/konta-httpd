@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><title>Pembuatan daftar isi direktori</title><meta name="generator" content="DocBook XSL Stylesheets V1.62.0" /><link rel="home" href="index.html" title="Dokumentasi Tugas 3 Kelompok Konta" /><link rel="up" href="penjelasan_program.html" title="Bab 1. Penjelasan Program" /><link rel="previous" href="pengiriman_file.html" title="Pengiriman file ke client" /><link rel="next" href="dynamic_content.html" title="Dynamic Content" /></head><link rel="stylesheet" type="text/css" href="style.css" /><body><div id="header"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">Pembuatan daftar isi direktori</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="pengiriman_file.html">Kembali</a></td><th width="60%" align="center">Bab 1. Penjelasan Program</th><td width="20%" align="right"><a accesskey="n" href="dynamic_content.html">Lanjut</a></td></tr></table></div></div><div id="content"><div class="section" lang="id" xml:lang="id"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a id="daftar_isi_direktori"></a>Pembuatan daftar isi direktori</h2></div></div><div></div></div><p>Setelah path dalam secondary storage dan URL disingkronisasi, maka fungsi ini 
+akan dieksekusi, jika file yang direquest oleh user melalui URL tidak ada 
+didalam direktori relatif halaman web tersebut. Maka yang akan kemudian 
+dilakukan oleh sistem webserver ini adalah mengeluarkan isi didalam direktori 
+relatif tersebut untuk kemudian ditampikan dalam user browser.Sehingga user bisa 
+melihat file-file maupun direktori berserta statistiknya (file size, dan last 
+modified) yang berada dalam direktori relatif halaman web tersebut, dan kemudian
+user bisa memilih file mana yang inginkan. </p><p>Pada saat sistem webserver mengetahui bahwa file yang di-request oleh user 
+melalui URL tidak ada didalam direkori relatif halaman web tersebut, maka sistem 
+webserver akan memanggil fungsi: 
+
+</p><div class="funcsynopsis"><p><code class="funcdef">DIR *<b class="fsfunc">opendir</b>(</code><var class="pdparam">name</var><code>)</code>;<br />const char *<code>name</code>;</p></div><p>
+
+dengan parameter, relatif path tersebut didalam secondary storage server. Dan 
+akan mereturn DIR* yang merupakan deskripsi mengenai direktori tersebut.</p><p>Kemudian webserver akan memanggil fungsi:
+
+</p><div class="funcsynopsis"><p><code class="funcdef">struct dirent *<b class="fsfunc">readdir</b>(</code><var class="pdparam">dir</var><code>)</code>;<br />DIR *<code>dir</code>;</p></div><p>
+
+dengan parameter variabel <tt class="varname">DIR *</tt> yang didapatkan ketika sistem memanggil fungsi 
+diatas. Fungsi ini akan me-return <tt class="varname">struct dirent *</tt>. Selama <tt class="varname">struct dirent *</tt> ini 
+tidak men-return <span class="returnvalue">NULL</span>, maka sistem medapatkan semua isi file-file dan direktori 
+didalamnya, dan ketika <tt class="varname">struct dirent *</tt> me-return <span class="returnvalue">NULL</span>, maka semua isi didalam 
+direktori telah selesai dibaca. </p><p>Ketika setiap file atau direktori telah didapat 
+ketika memanggil fungsi ini melalui variabel <tt class="varname">struct dirent *</tt>, maka statistik dari 
+file-file dan direktori didalam nya bisa didapatkan dengan memanggil fungsi:
+
+</p><div class="funcsynopsis"><table border="0" summary="Function synopsis" cellspacing="0" cellpadding="0" style="padding-bottom: 1em"><tr><td><code class="funcdef">int <b class="fsfunc">stat</b>(</code></td><td><var class="pdparam">file_name</var>, </td><td> </td></tr><tr><td> </td><td><var class="pdparam">buf</var><code>)</code>;</td><td> </td></tr></table><table border="0" summary="Function argument synopsis" cellspacing="0" cellpadding="0"><tr><td>const char * </td><td><var class="pdparam">file_name</var>;</td></tr><tr><td>struct stat * </td><td><var class="pdparam">buf</var>;</td></tr></table></div><p>
+
+dengan parameter pertama file-file yang berada didalam direktori relatif 
+tersebut, dan parameter kedua adalah pointer dari variabel <tt class="varname">struct stat</tt>. Setelah 
+semua statistik dari file-file dan direktori didalamnya didapatkan, maka semua 
+<tt class="varname">fileNama</tt>, beserta statistiknya diembed kedalam file HTML dan dikirimkan ke user 
+browser.</p><p>Ketika semuanya selesai dilakukan, maka langkah selanjutnya adalah 
+menutup direktori tersebut dengan memanggil fungsi:
+
+</p><div class="funcsynopsis"><p><code class="funcdef">int <b class="fsfunc">closedir</b>(</code><var class="pdparam">dir</var><code>)</code>;<br />DIR *<code>dir</code>;</p></div><p>
+
+dengan parameter variabel <tt class="varname">DIR *</tt> yang didapat ketika membuka direktori dengan 
+fungsi <tt class="function">opendir</tt> diatas.
+</p></div></div><div id="footer"><div class="navfooter"><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="pengiriman_file.html">Kembali</a></td><td width="20%" align="center"><a accesskey="u" href="penjelasan_program.html">Induk</a></td><td width="40%" align="right"><a accesskey="n" href="dynamic_content.html">Lanjut</a></td></tr><tr><td width="40%" align="left" valign="top">Pengiriman file ke client</td><td width="20%" align="center"><a accesskey="h" href="index.html">Depan</a></td><td width="40%" align="right" valign="top">Dynamic Content</td></tr></table></div></div></body></html>

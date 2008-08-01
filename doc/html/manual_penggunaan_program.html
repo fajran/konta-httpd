@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><title>Bab 4. Manual Penggunaan Program</title><meta name="generator" content="DocBook XSL Stylesheets V1.62.0" /><link rel="home" href="index.html" title="Dokumentasi Tugas 3 Kelompok Konta" /><link rel="up" href="index.html" title="Dokumentasi Tugas 3 Kelompok Konta" /><link rel="previous" href="kemungkinan_pengembangan_program.html" title="Bab 3. Kemungkinan Pengembangan Program" /><link rel="next" href="konfigurasi_server.html" title="Konfigurasi server" /></head><link rel="stylesheet" type="text/css" href="style.css" /><body><div id="header"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">Bab 4. Manual Penggunaan Program</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="kemungkinan_pengembangan_program.html">Kembali</a></td><th width="60%" align="center"></th><td width="20%" align="right"><a accesskey="n" href="konfigurasi_server.html">Lanjut</a></td></tr></table></div></div><div id="content"><div class="chapter" lang="id" xml:lang="id"><div class="titlepage"><div><div><h2 class="title"><a id="manual_penggunaan_program"></a>Bab 4. Manual Penggunaan Program</h2></div></div><div></div></div><div class="toc"><p><b>Daftar Isi</b></p><dl><dt><span class="section"><a href="manual_penggunaan_program.html#kompilasi">Kompilasi</a></span></dt><dt><span class="section"><a href="konfigurasi_server.html">Konfigurasi server</a></span></dt><dt><span class="section"><a href="menjalankan_server.html">Menjalankan server</a></span></dt></dl></div><p>Agar program bisa digunakan, pastikan Anda telah mengkompilasi source code 
+program menjadi sebuah file yang dapat dijalankan. Setelah source code 
+dikompilasi, barulah Anda dapat menjalankan dan menggunakan program.</p><div class="section" lang="id" xml:lang="id"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a id="kompilasi"></a>Kompilasi</h2></div></div><div></div></div><p>Program yang kami buat kami lengkapi dengan file <tt class="filename">Makefile</tt> sehingga program <span class="application">make</span>
+dapat digunakan untuk mempermudah melakukan kompilasi.</p><p>Contoh:
+</p><pre class="screen">
+$ make
+  [CC]     konta-httpd.o
+  [CC]     readdir.o
+  [CC]     util.o
+  [CC]     config.o
+  [CC]     request-handler.o
+  [CC]     cgi.o
+  [CC]     response.o
+  [LINK]   konta-httpd
+</pre><p>
+</p><p>Setelah source code dikompilasi, maka akan ada file <tt class="filename">konta-httpd</tt> yang merupakan
+file binary dari program.</p></div></div></div><div id="footer"><div class="navfooter"><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="kemungkinan_pengembangan_program.html">Kembali</a></td><td width="20%" align="center"><a accesskey="u" href="index.html">Induk</a></td><td width="40%" align="right"><a accesskey="n" href="konfigurasi_server.html">Lanjut</a></td></tr><tr><td width="40%" align="left" valign="top">Bab 3. Kemungkinan Pengembangan Program</td><td width="20%" align="center"><a accesskey="h" href="index.html">Depan</a></td><td width="40%" align="right" valign="top">Konfigurasi server</td></tr></table></div></div></body></html>

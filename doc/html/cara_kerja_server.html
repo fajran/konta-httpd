@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><title>Cara kerja Server</title><meta name="generator" content="DocBook XSL Stylesheets V1.62.0" /><link rel="home" href="index.html" title="Dokumentasi Tugas 3 Kelompok Konta" /><link rel="up" href="penjelasan_program.html" title="Bab 1. Penjelasan Program" /><link rel="previous" href="http_response.html" title="HTTP Response" /><link rel="next" href="fungsi_umum.html" title="Fungsi-fungsi umum" /></head><link rel="stylesheet" type="text/css" href="style.css" /><body><div id="header"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">Cara kerja Server</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="http_response.html">Kembali</a></td><th width="60%" align="center">Bab 1. Penjelasan Program</th><td width="20%" align="right"><a accesskey="n" href="fungsi_umum.html">Lanjut</a></td></tr></table></div></div><div id="content"><div class="section" lang="id" xml:lang="id"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a id="cara_kerja_server"></a>Cara kerja Server</h2></div></div><div></div></div><p>Pada dasarnya cara kerja server adalah menerjemahkan request yang dikirimkan
+oleh client dan memberikan response yang sesuai dengan request tersebut.</p><p>Saat server dihidupkan, server akan membaca file konfigurasi, lalu membuat soket 
+dan mulai menerima koneksi dari soket tersebut. Lalu tahapan-tahapan yang akan 
+terjadi adalah:
+</p><div class="orderedlist"><ol type="1"><li><p>Server menerima koneksi</p></li><li><p>Fungsi yang menangani koneksi akan dipanggil</p></li><li><p>Baris pertama request (Request Line) akan diambil dan diproses</p></li><li><p>Field Method, Request URI, dan HTTP-Version akan dipisahkan dari Request 
+   Line tersebut.</p></li><li><p>Server akan menerjemahkan Request URI tersebut menjadi path sebenarnya
+   pada harddisk server.</p></li><li><p>Server akan mengirim status code <tt class="literal">200</tt>, mengecek tipe file dan mengirimkan
+   file tersebut ke client.</p></li><li><p>Koneksi diputus.</p></li></ol></div><p>
+</p><p>Kemungkinan-kemungkinan lain yang mungkin ada adalah, jika file yang diminta
+ternyata sebuah direktori. Pada kondisi ini, server akan mengirimkan status
+code <tt class="literal">301</tt> beserta lokasi sebenarnya direktori tersebut ke client.</p><p>Jika client meminta sebuah direktori tanpa menyatakan file apa yang akan 
+ditampilkan, server akan mencari file-file indeks pada direktori tersebut.
+Jika ditemukan, server akan mengirim file tersebut, dan jika tidak isi direktori
+akan ditampilkan.</p><p>Client bisa saja meminta sebuah file yang tidak valid. Jika menemui
+kondisi seperti ini, server akan memberitahu client bahwa file yang diminta
+tidak valid dengan memberikan status code <tt class="literal">404</tt>.</p><p>Selain itu jika client me-request sebuah file yang berada dalam direktori 
+khusus script. File yang berada dalam direktori ini akan dianggap sebagai 
+sebuah program. Program akan dieksekusi oleh server dan output dari program
+tersebut akan dikirim ke client.</p><p>Jika client meminta file yang memiliki program khusus untuk memprosesnya,
+maka server akan menjalankan program tersebut dan output dari program akan 
+dikirim ke client.</p></div></div><div id="footer"><div class="navfooter"><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="http_response.html">Kembali</a></td><td width="20%" align="center"><a accesskey="u" href="penjelasan_program.html">Induk</a></td><td width="40%" align="right"><a accesskey="n" href="fungsi_umum.html">Lanjut</a></td></tr><tr><td width="40%" align="left" valign="top">HTTP Response</td><td width="20%" align="center"><a accesskey="h" href="index.html">Depan</a></td><td width="40%" align="right" valign="top">Fungsi-fungsi umum</td></tr></table></div></div></body></html>

@@ -1,0 +1,35 @@
+<?PHP
+	dokumetasi tugas 3 jarkom
+				-ekaditya-
+
+	melihat dan menampilkan isi direktori
+	~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	setelah path dalam secondary storage dan URL disingkronisasi, maka fungsi ini akan dieksekusi, 
+	jika file yang direquest oleh user melalui URL tidak ada didalam 
+	direktori relatif halaman web tersebut. Maka yang akan kemudian dilakukan oleh sistem webserver 
+	ini adalah mengeluarkan isi didalam direktori relatif tersebut untuk kemudian ditampikan dalam user browser.
+	Sehingga user bisa melihat file-file maupun direktori berserta statistiknya(file size, dan last modified)
+	yang berada dalam direktori relatif halaman web tersebut, dan kemudia user bisa memilih file mana yang inginkan. 
+
+	Pada saat sistem webserver mengetahui bahwa file yang di-request oleh user melalui URL tidak ada 
+	didalam direkori relatif halaman web tersebut, maka sistem webserver akan memanggil fungsi:
+		DIR *opendir(const char *name);
+	dengan parameter, relatif path tersebut didalam secondary storage server. dan akan mereturn DIR* 
+	yang merupakan deskripsi mengenai direktori tersebut. Kemudian webserver akan memanggil fungsi:
+		struct dirent *readdir(DIR *dir);
+	dengan parameter variabel DIR* yang didapatkan ketika sistem memanggil fungsi diatas. Fungsi ini 
+	akan me-return struct dirent*. selama struct dirent* ini tidak men-return NULL, maka sistem medapatkan semua 
+	isi file-file dan direktori didalamnya, dan ketika struct dirent* me-return NULL, maka semua isi didalam 
+	direktori telah selesai dibaca. Ketika setiap file atau direktori telah didapat ketika memanggil fungsi ini 
+	melalui variabel struct dirent*, maka statistik dari file-file dan direktori didalam nya bisa didapatkan 
+	dengan memanggil fungsi:
+		int stat(const char *file_name, struct stat *buf);
+	dengan parameter pertama file-file yang berada didalam direktori relatif tersebut, dan parameter kedua adalah
+	pointer dari variabel strut stat. Setelah semua statistik dari file-file dan direktori didalamnya didapatkan,
+	maka semua fileNama, beserta statistiknya diembed kedalam file html dan dikirimkan ke user browser. Ketika
+	semuanya selesai dilakukan, maka langkah selanjutnya adalah menutup direktori tersebut dengan memanggil 
+	fungsi:
+		int closedir(DIR *dir);
+	dengan parameter variabel DIR* yang didapat ketika membuka direktori dengan fungsi opendir diatas.
+?>
+

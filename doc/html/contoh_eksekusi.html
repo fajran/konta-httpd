@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><title>Bab 5. Contoh Eksekusi</title><meta name="generator" content="DocBook XSL Stylesheets V1.62.0" /><link rel="home" href="index.html" title="Dokumentasi Tugas 3 Kelompok Konta" /><link rel="up" href="index.html" title="Dokumentasi Tugas 3 Kelompok Konta" /><link rel="previous" href="menjalankan_server.html" title="Menjalankan server" /><link rel="next" href="referensi.html" title="Bab 6. Referensi" /></head><link rel="stylesheet" type="text/css" href="style.css" /><body><div id="header"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">Bab 5. Contoh Eksekusi</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="menjalankan_server.html">Kembali</a></td><th width="60%" align="center"></th><td width="20%" align="right"><a accesskey="n" href="referensi.html">Lanjut</a></td></tr></table></div></div><div id="content"><div class="chapter" lang="id" xml:lang="id"><div class="titlepage"><div><div><h2 class="title"><a id="contoh_eksekusi"></a>Bab 5. Contoh Eksekusi</h2></div></div><div></div></div><p>Dalam demo program ini, server dikonfigurasi dengan file konfigurasi seperti
+di bawah ini:
+
+</p><pre class="screen">
+ServerPort 29182
+DocumentRoot htdocs/
+DirectoryIndex index.html
+AddType text/html .html
+AddType image/png .png
+AddType application/x-httpd-php .php
+DefaultType text/plain
+Action application/x-httpd-php /usr/lib/cgi-bin/php4
+ScriptAlias /cgi-bin/ cgi-bin/
+</pre><p>
+</p><p>Isi dari direktori <tt class="filename">htdocs/</tt> adalah
+</p><pre class="screen">
+index.html
+direktori/
+direktori/index.htm
+phpinfo.php
+gambar/gambar.png
+teks.txt
+</pre><p>
+</p><p>Isi dari direktori <tt class="filename">cgi-bin/</tt> adalah
+</p><pre class="screen">
+adder.sh
+</pre><p>
+</p><p>Isi dari file <tt class="filename">index.html</tt> adalah
+</p><pre class="screen">
+&lt;html&gt;&lt;body&gt;
+&lt;h1&gt;Selamat datang!&lt;/h1&gt;
+&lt;p&gt;Server ini menggunakan Konta-HTTP Server&lt;/p&gt;
+&lt;/body&gt;&lt;/html&gt;
+</pre><p>
+</p><p>Isi dari file <tt class="filename">direktori/index.htm</tt> adalah
+</p><pre class="screen">
+&lt;html&gt;&lt;body&gt;
+&lt;p&gt;Ini adalah file index.htm yang berada dalam direktori direktori/&lt;/p&gt;
+&lt;/body&gt;&lt;/html&gt;
+</pre><p>
+</p><p>Isi dari file <tt class="filename">phpinfo.php</tt> adalah
+</p><pre class="screen">
+&lt;? phpinfo(); ?&gt;
+</pre><p>
+</p><p>Isi dari file <tt class="filename">adder.sh</tt> adalah
+</p><pre class="screen">
+#!/bin/sh
+
+vars=`echo $QUERY_STRING | sed s/\&amp;/\ /g`
+vars=( $vars )
+                                                                                
+num1=${vars[0]}
+num2=${vars[1]}
+                                                                                
+echo -n -e "Content-type: text/plain\r\n"
+echo -n -e "\r\n"
+                                                                                
+echo -n -e "Bilangan pertama: $num1\n"
+echo -n -e "Bilangan kedua  : $num2\n"
+                                                                                
+jumlah=$(( $num1 + $num2 ))
+                                                                                
+echo -n -e "Jumlah          : $jumlah\n"
+</pre><p>
+</p><p>Di bawah ini merupakan tampilan yang muncul pada browser saat me-request
+sesuatu ke server.</p><div class="orderedlist"><ol type="1"><li><p>Request: http://localhost:29182</p><div class="figure"><a id="id2516668"></a><p class="title"><b>Gambar 5.1. Directory Index</b></p><div><img src="img/index.html.jpg" alt="Directory Index" /></div></div><p>Pada contoh di atas, walaupun client meminta sebuah direktori yang
+ditampilkan adalah file <tt class="filename">index.html</tt> karena <tt class="filename">index.html</tt> merupakan file indeks</p></li><li><p>Request: http://localhost:29182/direktori</p><div class="figure"><a id="id2516705"></a><p class="title"><b>Gambar 5.2. Isi direktori</b></p><div><img src="img/direktori.jpg" alt="Isi direktori" /></div></div><p>Pada contoh di atas, client kembali meminta sebuah direktori. Namun
+karena file yang menjadi indeks tidak ditemukan, maka isi direktori akan ditampilkan.</p></li><li><p>Request: http://localhost:29182/direktori/index.htm</p><div class="figure"><a id="id2516730"></a><p class="title"><b>Gambar 5.3. Default Type</b></p><div><img src="img/index.htm.jpg" alt="Default Type" /></div></div><p>Pada contoh di atas, client meminta sebuah file bernama <tt class="filename">index.htm</tt>.
+Karena tidak ada content-type untuk file dengan ekstensi .htm, maka content-type default, yaitu 
+text/plain, akan digunakan. File <tt class="filename">index.htm</tt> akan dianggap sebagai file
+teks biasa.</p></li><li><p>Request: http://localhost:29182/gambar/gambar.png</p><div class="figure"><a id="id2516769"></a><p class="title"><b>Gambar 5.4. Gambar</b></p><div><img src="img/gambar.png.jpg" alt="Gambar" /></div></div><p>Pada contoh di atas, server berhasil mengirimkan sebuah gambar dengan isi dan
+content-type yang tepat sehingga browser dapat menampilkan gambar tersebut dengan benar.</p></li><li><p>Request: http://localhost:29182/tidak_ada</p><div class="figure"><a id="id2516795"></a><p class="title"><b>Gambar 5.5. Not Found</b></p><div><img src="img/tidak_ada.jpg" alt="Not Found" /></div></div><p>Pada contoh di atas, client meminta sebuah file yang tidak valid. Server mengembalikan
+response <tt class="literal">404</tt> ke client.</p></li><li><p>Request: http//localhost:29182/cgi-bin/adder.sh?29385&amp;29182</p><div class="figure"><a id="id2516826"></a><p class="title"><b>Gambar 5.6. Dynamic Content</b></p><div><img src="img/adder.sh.jpg" alt="Dynamic Content" /></div></div><p>Pada contoh di atas, server menjalankan program <tt class="filename">adder.sh</tt>
+dan mengirimkan output program ke client sehingga dapat ditampilkan pada browser.</p></li><li><p>Request: http://localhost:29182/phpinfo.php</p><div class="figure"><a id="id2516858"></a><p class="title"><b>Gambar 5.7. Dynamic Content 2</b></p><div><img src="img/phpinfo.php.jpg" alt="Dynamic Content 2" /></div></div><p>Pada contoh di atas, client meminta file yang mengharuskan server menjalankan
+program tertentu. Dalam contoh ini, program <span class="application">PHP</span> akan
+dijalankan oleh server.</p></li></ol></div></div></div><div id="footer"><div class="navfooter"><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="menjalankan_server.html">Kembali</a></td><td width="20%" align="center"><a accesskey="u" href="index.html">Induk</a></td><td width="40%" align="right"><a accesskey="n" href="referensi.html">Lanjut</a></td></tr><tr><td width="40%" align="left" valign="top">Menjalankan server</td><td width="20%" align="center"><a accesskey="h" href="index.html">Depan</a></td><td width="40%" align="right" valign="top">Bab 6. Referensi</td></tr></table></div></div></body></html>

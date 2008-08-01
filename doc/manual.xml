@@ -1,0 +1,955 @@
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.1//EN"
+    "/usr/share/docbook-xml/docbookx.dtd">
+<book lang="id">
+    <bookinfo>
+        <title>Dokumentasi Tugas 3 Kelompok Konta</title>
+        <subtitle>Jaringan Komputer</subtitle>
+        <authorgroup>
+            <author>
+                <personname>
+                    <firstname>Delonika</firstname>
+                    <surname>Yuki Eka Putra</surname>
+                </personname>
+                <email>dyep20@mhs.cs.ui.ac.id</email>
+                <personblurb>1202000303</personblurb>
+            </author>
+            <author>
+                <personname>
+                    <firstname>Dimas</firstname>
+                    <surname>Julian M. R.</surname>
+                </personname>
+                <email>djmr20@mhs.cs.ui.ac.id</email>
+                <personblurb>1202000362</personblurb>
+            </author>
+            <author>
+                <personname>
+                    <firstname>Eka</firstname>
+                    <surname>Aditya</surname>
+                </personname>
+                <email>eka20@mhs.cs.ui.ac.id</email>
+                <personblurb>1202000389</personblurb>
+            </author>
+            <author>
+                <personname>
+                    <firstname>Fajran</firstname>
+                    <surname>Iman Rusadi</surname>
+                </personname>
+                <email>iman20@mhs.cs.ui.ac.id</email>
+                <personblurb>1202000427</personblurb>
+            </author>
+        </authorgroup>
+        <pubdate>2004</pubdate>
+        <copyright>
+            <year>2004</year>
+            <holder>Kelompok Konta</holder>
+        </copyright>
+    </bookinfo>
+
+	<chapter id="penjelasan_program">
+		<title>Penjelasan Program</title>
+
+<para>Program yang dibuat dalam tugas 3 kuliah Jaringan Komputer ini adalah sebuah
+program server yang bekerja pada protokol HTTP, atau biasa disebut Web Server.</para>
+
+<para>Web Server akan menerima koneksi dari client dan akan memproses request yang
+dikirim oleh client (HTTP Request). Lalu server akan memproses request yang
+diberikan dan memberikan respon balik ke client (HTTP Response). Pada dasarnya 
+request dari client merupakan request yang meminta sebuah file yang ada pada 
+server, dan server akan mengirimkan file yang diminta kepada client. </para>
+
+		<section id="http_request">
+			<title>HTTP Request</title>
+
+<para>Setelah client melakukan koneksi dengan web server, client akan mengirimkan
+HTTP Request. HTTP Request ini terdiri dari tiga bagian, yaitu request line,
+header dan data. Sesuai dengan RFC 2616, request line memiliki format sebagai
+berikut:
+
+<screen>
+Request-Line   = Method SP Request-URI SP HTTP-Version CRLF
+</screen>
+</para>
+
+<para>Contohnya adalah
+
+<screen>
+GET /index.html HTTP/1.0
+</screen>
+</para>
+
+<para>Pada tugas kali ini, kami hanya akan memperhatikan request yang memiliki 
+Method GET. Untuk method-method lainnya akan diabaikan dan mengirim pesan
+error kepada client. Bagian lain dari HTTP Request, yaitu header dan data, juga 
+akan diabaikan.</para>
+
+		</section>
+		
+		<section id="http_response">
+			<title>HTTP Response</title>
+
+<para>Setelah client mengirimkan HTTP Request, server akan memproses request tersebut
+dan akan memberikan tanggapan berupa HTTP Response kepada client. Menurut
+RFC 2616, HTTP Response terdiri dari tiga bagian, yaitu status line, header, 
+dan data. </para>
+
+<para>Status line berisi keterangan mengenai respon yang server berikan. Format dari
+status line adalah:
+
+<screen>
+Status-Line = HTTP-Version SP Status-Code SP Reason-Phrase CRLF
+</screen>
+</para>
+
+<para>Status code berisi sebuah angka sepanjang tiga digit yang berisi keterangan 
+mengenai tipe respon yang diberikan oleh server. Ada 5 jenis status code, yaitu:
+<orderedlist numeration="arabic">
+<listitem><para>Informational (<literal>1xx</literal>)</para></listitem>
+<listitem><para>Success (<literal>2xx</literal>)</para></listitem>
+<listitem><para>Redirection (<literal>3xx</literal>)</para></listitem>
+<listitem><para>Client Error (<literal>4xx</literal>)</para></listitem>
+<listitem><para>Server Error (<literal>5xx</literal>)</para></listitem>
+</orderedlist>
+</para>
+
+<para>Pada tugas kali ini kami akan mencoba menggunakan beberapa status code, yaitu
+<literal>200</literal> (OK), <literal>301</literal> (Move Permanently), <literal>404</literal> (Not Found), <literal>500</literal> (Internal Server Error),
+dan <literal>501</literal> (Not Implemented).</para>
+
+<para>Status code <literal>200</literal> akan diberikan ketika server berhasil memproses request yang 
+diberikan oleh client dan server akan mengirim data yang diminta oleh client.
+Status code <literal>301</literal> diberikan ketika client me-request sebuah file yang ternyata
+berupa direktori. Server akan memerintahkan client untuk mengubah request
+untuk meminta direktori tersebut. Status code <literal>404</literal> akan diberikan oleh server
+ketika client meminta file yang tidak ada pada server. Server akan memberikan
+status code <literal>500</literal> ketika terjadi kesalahan internal pada server. Sedangkan status
+code <literal>501</literal> akan diberikan ketika client menggunakan request method selain GET.</para>
+
+		</section>
+		
+		<section id="cara_kerja_server">
+		
+			<title>Cara kerja Server</title>
+
+<para>Pada dasarnya cara kerja server adalah menerjemahkan request yang dikirimkan
+oleh client dan memberikan response yang sesuai dengan request tersebut.</para>
+
+<para>Saat server dihidupkan, server akan membaca file konfigurasi, lalu membuat soket 
+dan mulai menerima koneksi dari soket tersebut. Lalu tahapan-tahapan yang akan 
+terjadi adalah:
+<orderedlist>
+<listitem><para>Server menerima koneksi</para></listitem>
+<listitem><para>Fungsi yang menangani koneksi akan dipanggil</para></listitem>
+<listitem><para>Baris pertama request (Request Line) akan diambil dan diproses</para></listitem>
+<listitem><para>Field Method, Request URI, dan HTTP-Version akan dipisahkan dari Request 
+   Line tersebut.</para></listitem>
+<listitem><para>Server akan menerjemahkan Request URI tersebut menjadi path sebenarnya
+   pada harddisk server.</para></listitem>
+<listitem><para>Server akan mengirim status code <literal>200</literal>, mengecek tipe file dan mengirimkan
+   file tersebut ke client.</para></listitem>
+<listitem><para>Koneksi diputus.</para></listitem>
+</orderedlist>
+</para>
+
+<para>Kemungkinan-kemungkinan lain yang mungkin ada adalah, jika file yang diminta
+ternyata sebuah direktori. Pada kondisi ini, server akan mengirimkan status
+code <literal>301</literal> beserta lokasi sebenarnya direktori tersebut ke client.</para>
+
+<para>Jika client meminta sebuah direktori tanpa menyatakan file apa yang akan 
+ditampilkan, server akan mencari file-file indeks pada direktori tersebut.
+Jika ditemukan, server akan mengirim file tersebut, dan jika tidak isi direktori
+akan ditampilkan.</para>
+
+<para>Client bisa saja meminta sebuah file yang tidak valid. Jika menemui
+kondisi seperti ini, server akan memberitahu client bahwa file yang diminta
+tidak valid dengan memberikan status code <literal>404</literal>.</para>
+
+<para>Selain itu jika client me-request sebuah file yang berada dalam direktori 
+khusus script. File yang berada dalam direktori ini akan dianggap sebagai 
+sebuah program. Program akan dieksekusi oleh server dan output dari program
+tersebut akan dikirim ke client.</para>
+
+<para>Jika client meminta file yang memiliki program khusus untuk memprosesnya,
+maka server akan menjalankan program tersebut dan output dari program akan 
+dikirim ke client.</para>
+
+		</section>
+
+		<section id="fungsi_umum">
+			<title>Fungsi-fungsi umum</title>
+
+<para>Ada beberapa fungsi-fungsi yang di-share untuk semua bagian pada server, antara
+lain adalah:
+
+<orderedlist>
+<listitem><para>Fungsi untuk membaca 1 baris data yang dikirim oleh client (<function>read_line()</function>)</para>
+
+<para>Fungsi ini khusus dibuat karena tidak ada fungsi standar yang disediakan untuk 
+membaca satu baris data. Cara kerja fungsi ini adalah membaca setiap karakter 
+yang dikirimkan sampai ditemukan <constant>NEWLINE</constant>. Karakter yang bukan <constant>NEWLINE</constant> akan 
+dimasukkan ke dalam sebuah buffer yang telah ditentukan berapa panjang 
+maksimalnya. Setelah ditemukan <constant>NEWLINE</constant> atau sudah mencapai panjang maksimal, 
+fungsi ini akan berhenti bekerja dan variabel buffer sudah berisi 
+karakter-karakter yang dikirim, tidak termasuk karakter <constant>NEWLINE</constant>.</para>
+</listitem>
+
+<listitem><para>Fungsi untuk merapikan Request URI (<function>bersihkan_path()</function>)</para>
+
+<para>Fungsi ini akan membuang karakter-karakter tidak berguna dari Request URI, 
+seperti <filename>/./</filename>, <filename>//</filename>, <filename>/.</filename>, dan <filename>./</filename>. Jika ditemukan untaian karakter <filename>/./</filename> atau <filename>//</filename> maka
+akan diubah menjadi <filename>/</filename> saja. Jika ditemukan <filename>/.</filename> pada akhir request URI, maka akan
+diubah menjadi <filename>/</filename> dan jika <filename>./</filename> ditemukan pada awal request URI, maka akan diubah
+menjadi <filename>/</filename>.</para>
+
+<para>Selain itu, escaped character akan diterjemahkan menjadi bentuk aslinya. 
+Escaped character merupakan representasi sebuah karakter dalam bentuk 
+heksadesimal yang diawali dengan karakter <literal>%</literal>. Salah satu guna dari escaped 
+character adalah ketika client ingin me-request sebuah file yang mengandung
+karakter spasi. Karena karakter spasi merupakan delimiter dari Request Line, 
+maka karakter spasi harus diubah dahulu menjadi <literal>%20</literal>. Angka 20 merupakan bilangan
+dengan basis 16 (heksadesimal) yang sama nilainya dengan angka 32 dalam basis
+10 (desimal). Nilai 32 dalam tabel <acronym>ASCII</acronym> merupakan sebuah karakter spasi.</para>
+</listitem>
+
+<listitem><para>Fungsi untuk menentukan tipe dari sebuah file (<function>cek_tipe_file()</function>)</para>
+
+<para>Fungsi ini berguna untuk mengetahui apakah file yang di-request valid atau 
+tidak. Untuk itu fungsi ini akan mereturn 1 jika file yang direquest memang 
+merupakan regular file dengan fungsi dari linux <function>IS_REG(m)</function>. Fungsi ini akan 
+mereturn 2 jika file yang direquest merupakan nama dari directory dengan 
+menggunakan fungsi <function>IS_DIR(m)</function>. Jika file yang direquest tidak memenuhi kondisi 
+sebelumnya maka akan mereturn 0. m merupakan variable dengan jenis struct stat.</para>
+
+<para>Untuk mendapatkan statistik dari file-file dan directory didalamnya maka 
+dipanggil fungsi :
+
+<funcsynopsis>
+<funcprototype>
+<funcdef>int <function>stat</function></funcdef>
+	<paramdef>char *<parameter>fileName</parameter></paramdef>
+	<paramdef>struct stat *<parameter>buf</parameter></paramdef>
+</funcprototype>
+</funcsynopsis>
+
+dengan parameter pertama, merupakan file-file yang berada dalam directory
+relatif tersebut dan parameter kedua pointer dari variabel struct stat.</para>
+
+<para>Setelah semua statistik dari file yang diminta tersebut didapatkan maka
+fungsi tersebut mencheck jenis file tersebut yang telah dijelaskan di 
+atas.</para>
+</listitem>
+
+<listitem><para>Fungsi untuk mendapatkan tipe dari file yang akan dikirim 
+   (<function>get_content_type()</function>)</para>
+
+<para>Fungsi ini akan mencari content-type yang sesuai dengan ekstensi yang diberikan
+sebagai parameter fungsi. Jika tidak ditemukan, maka content-type default akan
+diberikan.</para>
+</listitem>
+
+<listitem><para>Fungsi untuk mengecek apakah ada program yang menangani jenis file tertentu.</para>
+
+<para>Fungsi ini akan mencari path program yang menangani suatu jenis file. Contohnya
+adalah file dengan ekstensi <filename>.php</filename> akan ditangani oleh program <application>PHP</application>. Jika ditemukan
+maka fungsi akan mengeluarkan path program yang bersangkutan, jika tidak maka
+nilai <returnvalue>NULL</returnvalue> akan dikeluarkan.</para>
+</listitem>
+
+<listitem><para>Fungsi untuk mengecek apakah client me-request sebuah script.</para>
+
+<para>Fungsi ini akan mengecek apakah client meminta untuk menjalankan sebuah program.
+Program-program yang dapat dijalankan diletakkan pada sebuah direktori tertentu
+yang dimasukkan dalam sebuah tabel. Daftar direktori ini dapat diatur melalui
+file konfigurasi. Jika client meminta direktori yang ada dalam tabel, maka 
+file yang diminta oleh client akan dianggap menjadi sebuah program, sehingga
+program tersebut harus dijalankan terlebih dahulu. Output dari program akan
+ditangkap oleh server dan dikirimkan ke client.</para>
+</listitem>
+</orderedlist>
+
+</para>
+
+		</section>
+		
+		<section id="pengiriman_file">
+			<title>Pengiriman file ke client</title>
+			
+			<para></para>
+
+		</section>
+		
+		<section id="daftar_isi_direktori">
+			<title>Pembuatan daftar isi direktori</title>
+
+<para>Setelah path dalam secondary storage dan URL disingkronisasi, maka fungsi ini 
+akan dieksekusi, jika file yang direquest oleh user melalui URL tidak ada 
+didalam direktori relatif halaman web tersebut. Maka yang akan kemudian 
+dilakukan oleh sistem webserver ini adalah mengeluarkan isi didalam direktori 
+relatif tersebut untuk kemudian ditampikan dalam user browser.Sehingga user bisa 
+melihat file-file maupun direktori berserta statistiknya (file size, dan last 
+modified) yang berada dalam direktori relatif halaman web tersebut, dan kemudian
+user bisa memilih file mana yang inginkan. </para>
+
+<para>Pada saat sistem webserver mengetahui bahwa file yang di-request oleh user 
+melalui URL tidak ada didalam direkori relatif halaman web tersebut, maka sistem 
+webserver akan memanggil fungsi: 
+
+<funcsynopsis>
+<funcprototype>
+<funcdef>DIR *<function>opendir</function></funcdef>
+	<paramdef>const char *<parameter>name</parameter></paramdef>
+</funcprototype>
+</funcsynopsis>
+
+dengan parameter, relatif path tersebut didalam secondary storage server. Dan 
+akan mereturn DIR* yang merupakan deskripsi mengenai direktori tersebut.</para>
+
+<para>Kemudian webserver akan memanggil fungsi:
+
+<funcsynopsis>
+<funcprototype>
+<funcdef>struct dirent *<function>readdir</function></funcdef>
+	<paramdef>DIR *<parameter>dir</parameter></paramdef>
+</funcprototype>
+</funcsynopsis>
+
+dengan parameter variabel <varname>DIR *</varname> yang didapatkan ketika sistem memanggil fungsi 
+diatas. Fungsi ini akan me-return <varname>struct dirent *</varname>. Selama <varname>struct dirent *</varname> ini 
+tidak men-return <returnvalue>NULL</returnvalue>, maka sistem medapatkan semua isi file-file dan direktori 
+didalamnya, dan ketika <varname>struct dirent *</varname> me-return <returnvalue>NULL</returnvalue>, maka semua isi didalam 
+direktori telah selesai dibaca. </para>
+
+<para>Ketika setiap file atau direktori telah didapat 
+ketika memanggil fungsi ini melalui variabel <varname>struct dirent *</varname>, maka statistik dari 
+file-file dan direktori didalam nya bisa didapatkan dengan memanggil fungsi:
+
+<funcsynopsis>
+<funcprototype>
+<funcdef>int <function>stat</function></funcdef>
+	<paramdef>const char *<parameter>file_name</parameter></paramdef>
+	<paramdef>struct stat *<parameter>buf</parameter></paramdef>
+</funcprototype>
+</funcsynopsis>
+
+dengan parameter pertama file-file yang berada didalam direktori relatif 
+tersebut, dan parameter kedua adalah pointer dari variabel <varname>struct stat</varname>. Setelah 
+semua statistik dari file-file dan direktori didalamnya didapatkan, maka semua 
+<varname>fileNama</varname>, beserta statistiknya diembed kedalam file HTML dan dikirimkan ke user 
+browser.</para>
+
+<para>Ketika semuanya selesai dilakukan, maka langkah selanjutnya adalah 
+menutup direktori tersebut dengan memanggil fungsi:
+
+<funcsynopsis>
+<funcprototype>
+<funcdef>int <function>closedir</function></funcdef>
+	<paramdef>DIR *<parameter>dir</parameter></paramdef>
+</funcprototype>
+</funcsynopsis>
+
+dengan parameter variabel <varname>DIR *</varname> yang didapat ketika membuka direktori dengan 
+fungsi <function>opendir</function> diatas.
+</para>
+
+		</section>
+		
+		<section id="dynamic_content">
+			<title>Dynamic Content</title>
+
+<para>Server yang kami buat dapat diatur untuk memproses dynamic content melalui dua
+cara, yaitu:
+<orderedlist>
+<listitem><para>Menjalakan program yang ada dalam <varname>ScriptAlias</varname>.</para></listitem>
+<listitem><para>Menjalakan program tertentu karena client meminta file dengan tipe tertentu.</para></listitem>
+</orderedlist>
+</para>
+
+<para>Kami mencoba mengimplementasikan sebagian dari protokol CGI untuk memanggil
+program yang diinginkan.</para>
+
+<para>Tahapan yang terjadi saat server ingin menjalankan program lain adalah:
+<orderedlist>
+<listitem><para>Membuat environment variabel yang mengandung informasi server, file yang
+   dijalankan, Request Method, dan sebagainya.</para></listitem>
+<listitem><para>Membuat pipa antara dua buah file descriptor dengan menggunakan fungsi <function>pipe()</function>.</para></listitem>
+<listitem><para>Membuat proses baru dengan menggunakan fungsi <function>fork()</function>.</para></listitem>
+<listitem><para>Pada proses anak, tahapan yang terjadi adalah:
+	<orderedlist>
+	<listitem><para>File descriptor pipa untuk menulis diduplikasikan dengan standard output 
+	proses tersebut, sehingga standard output proses beralih ke file 
+	descriptor pipa.</para></listitem>
+	<listitem><para>Kedua buah file descriptor pipa ditutup.</para></listitem>
+	<listitem><para>Program dieksekusi dengan menggunakan fungsi <function>execle()</function>.</para></listitem>
+	</orderedlist>
+	</para></listitem>
+<listitem><para>Pada proses asli, tahapan yang terjadi adalah:
+	<orderedlist>
+	<listitem><para>File descriptor pipa untuk menulis ditutup.</para></listitem>
+	<listitem><para>Dilakukan pembacaan file descriptor pipa dan data yang diterima langsung
+      dikirimkan ke client.</para></listitem>
+	</orderedlist>
+	</para></listitem>
+</orderedlist>
+</para>
+
+<para>Saat proses membuat pipa, maka akan didapatkan dua buah file descriptor yaitu file
+descriptor untuk mengirim data dan menerima data.</para>
+
+<screen>
+<![CDATA[
+    +----| proses 1 |----+
+    |                    |
+    +-->---| pipa |--->--+
+]]>
+</screen>
+ 
+<para>Saat proses membuat proses baru, maka akan ada dua buah proses yang terhubung
+ke dalam satu buah pipa yang sama.</para>
+
+<screen>
+<![CDATA[
+    +-----| proses 1 |-----+
+    |                      |
+    | +---| proses 2 |---+ |
+    | |                  | |
+    | +->---|      |--->-+ |
+    |       | pipa |       |
+    +--->---|      |--->---+
+]]>
+</screen>
+
+<para>Proses 1 dapat menutup file descriptor untuk menulis dan Proses 2 dapat menutup
+file descriptor untuk membaca.</para>
+
+<screen>
+<![CDATA[
+          | proses 1 |-----+
+                           |
+      +---| proses 2 |     |
+      |                    |
+      +->---|      |       |
+            | pipa |       |
+            |      |--->---+
+]]>
+</screen>
+
+<para>Sehingga antara Proses 1 dan Proses 2 dapat saling berkomunikasi melalui pipa 
+tersebut.</para>
+
+<para>Kemudian Proses 2 mengalihkan file descriptor untuk menulis tersebut menjadi
+standard output milik Proses 2. Sehingga jika Proses 2 mengeluarkan output
+melalui standard output, Proses 1 dapat menangkap output tersebut.</para>
+
+<para>Selanjutnya, Proses 1 dapat mengirimkan data dari Proses 2 ke client.</para>
+
+<screen>
+<![CDATA[
+    >-- data dari proses 2 -->--| proses 1 |-->-- socket ke client -->
+]]>
+</screen>  
+  
+		</section>
+
+	</chapter>
+	
+	<chapter id="batasan_program_dan_asumsi">
+		<title>Batasan Program dan Asumsi</title>
+	
+<para>Asumsi yang kami pakai dalam pengerjaan tugas kali ini adalah:
+<orderedlist>
+<listitem><para>Tidak ada banyak client yang melakukan koneksi secara simultan.</para></listitem>
+<listitem><para>Program yang dijalankan oleh server saat memproses dynamic content akan 
+   berjalan dengan normal dan tidak meninggalkan error apapun.</para></listitem>
+<listitem><para>Client akan melakukan request secara normal.</para></listitem>
+</orderedlist>
+</para>
+
+<para>Program ini memiliki keterbatasan-keterbatasan, antara lain:
+<orderedlist>
+<listitem><para>Tidak bisa melakukan pemutusan koneksi secara otomatis setelah beberapa
+   waktu tertentu (ada timeout koneksi)</para></listitem>
+<listitem><para>2. Server melakukan <function>fork()</function> setiap ada koneksi yang masuk. Jika ada banyak 
+   koneksi secara simultan maka beban server akan meningkat.</para></listitem>
+</orderedlist>
+</para>
+
+	</chapter>
+	
+	<chapter id="kemungkinan_pengembangan_program">
+		<title>Kemungkinan Pengembangan Program</title>
+
+<para>Program yang kami buat masih mungkin dikembangkan lebih lanjut, antara lain:
+<orderedlist>
+<listitem><para>Penggunaan thread yang lebih ringan daripada pembuatan proses baru saat ada
+   koneksi yang masuk.</para></listitem>
+<listitem><para>Pengaturan timeout setiap koneksi yang masuk.</para></listitem>
+<listitem><para>Penanganan persistent connection/multiple request dalam satu buah koneksi.</para></listitem>
+</orderedlist>
+</para>
+
+	</chapter>
+
+	<chapter id="manual_penggunaan_program">
+		<title>Manual Penggunaan Program</title>
+
+<para>Agar program bisa digunakan, pastikan Anda telah mengkompilasi source code 
+program menjadi sebuah file yang dapat dijalankan. Setelah source code 
+dikompilasi, barulah Anda dapat menjalankan dan menggunakan program.</para>
+
+		<section id="kompilasi">
+			<title>Kompilasi</title>
+
+<para>Program yang kami buat kami lengkapi dengan file <filename>Makefile</filename> sehingga program <application>make</application>
+dapat digunakan untuk mempermudah melakukan kompilasi.</para>
+
+<para>Contoh:
+<screen>
+$ make
+  [CC]     konta-httpd.o
+  [CC]     readdir.o
+  [CC]     util.o
+  [CC]     config.o
+  [CC]     request-handler.o
+  [CC]     cgi.o
+  [CC]     response.o
+  [LINK]   konta-httpd
+</screen>
+</para>
+
+<para>Setelah source code dikompilasi, maka akan ada file <filename>konta-httpd</filename> yang merupakan
+file binary dari program.</para>
+
+		</section>
+		
+		<section id="konfigurasi_server">
+			<title>Konfigurasi server</title>
+
+<para>Program yang kami buat dapat dikonfigurasi dari luar program sehingga tidak
+perlu melakukan kompilasi ulang ketika ingin mengubah konfigurasi. Konfigurasi
+dilakukan melalui sebuah file bernama <filename>conf/konta-httpd.conf</filename>.</para>
+
+<para>Keterangan mengenai file konfigurasi dapat dibaca pada <xref linkend="file_konfigurasi"/>.</para>
+
+		</section>
+		
+		<section id="menjalankan_server">
+			<title>Menjalankan server</title>
+
+<para>Untuk menjalakankan program server, cukup panggil program server yang terbentuk 
+dari hasil kompilasi.</para>
+
+<para>Contoh:
+<screen>
+$ ./konta-httpd
+Konta-HTTP Server running on port 8000...
+</screen>
+</para>
+
+<para>Setelah server berjalan, Anda bisa mencoba mengakses server melalui browser
+kesayangan Anda.</para>
+
+<para>Secara default, direktori dokumen html ada pada direktori <filename>htdocs/</filename>. Anda dapat 
+meletakkan beberapa file yang dapat Anda gunakan untuk mencoba server kami ini.</para>
+	
+		</section>
+	</chapter>
+	
+	<chapter id="contoh_eksekusi">
+		<title>Contoh Eksekusi</title>
+		
+<para>Dalam demo program ini, server dikonfigurasi dengan file konfigurasi seperti
+di bawah ini:
+
+<screen>
+ServerPort 29182
+DocumentRoot htdocs/
+DirectoryIndex index.html
+AddType text/html .html
+AddType image/png .png
+AddType application/x-httpd-php .php
+DefaultType text/plain
+Action application/x-httpd-php /usr/lib/cgi-bin/php4
+ScriptAlias /cgi-bin/ cgi-bin/
+</screen>
+</para>
+
+<para>Isi dari direktori <filename>htdocs/</filename> adalah
+<screen>
+index.html
+direktori/
+direktori/index.htm
+phpinfo.php
+gambar/gambar.png
+teks.txt
+</screen>
+</para>
+
+<para>Isi dari direktori <filename>cgi-bin/</filename> adalah
+<screen>
+adder.sh
+</screen>
+</para>
+
+<para>Isi dari file <filename>index.html</filename> adalah
+<screen><![CDATA[
+<html><body>
+<h1>Selamat datang!</h1>
+<p>Server ini menggunakan Konta-HTTP Server</p>
+</body></html>
+]]></screen>
+</para>
+
+<para>Isi dari file <filename>direktori/index.htm</filename> adalah
+<screen><![CDATA[
+<html><body>
+<p>Ini adalah file index.htm yang berada dalam direktori direktori/</p>
+</body></html>
+]]></screen>
+</para>
+
+<para>Isi dari file <filename>phpinfo.php</filename> adalah
+<screen><![CDATA[
+<? phpinfo(); ?>
+]]></screen>
+</para>
+
+<para>Isi dari file <filename>adder.sh</filename> adalah
+<screen><![CDATA[
+#!/bin/sh
+
+vars=`echo $QUERY_STRING | sed s/\&/\ /g`
+vars=( $vars )
+                                                                                
+num1=${vars[0]}
+num2=${vars[1]}
+                                                                                
+echo -n -e "Content-type: text/plain\r\n"
+echo -n -e "\r\n"
+                                                                                
+echo -n -e "Bilangan pertama: $num1\n"
+echo -n -e "Bilangan kedua  : $num2\n"
+                                                                                
+jumlah=$(( $num1 + $num2 ))
+                                                                                
+echo -n -e "Jumlah          : $jumlah\n"
+]]></screen>
+</para>
+
+<para>Di bawah ini merupakan tampilan yang muncul pada browser saat me-request
+sesuatu ke server.</para>
+
+<orderedlist>
+<listitem><para>Request: http://localhost:29182</para>
+<figure>
+	<title>Directory Index</title>
+	<graphic fileref="img/index.html.jpg"/>
+</figure>
+
+<para>Pada contoh di atas, walaupun client meminta sebuah direktori yang
+ditampilkan adalah file <filename>index.html</filename> karena <filename>index.html</filename> merupakan file indeks</para>
+</listitem>
+
+<listitem><para>Request: http://localhost:29182/direktori</para>
+<figure>
+	<title>Isi direktori</title>
+	<graphic fileref="img/direktori.jpg"/>
+</figure>
+
+<para>Pada contoh di atas, client kembali meminta sebuah direktori. Namun
+karena file yang menjadi indeks tidak ditemukan, maka isi direktori akan ditampilkan.</para>
+</listitem>
+
+<listitem><para>Request: http://localhost:29182/direktori/index.htm</para>
+<figure>
+	<title>Default Type</title>
+	<graphic fileref="img/index.htm.jpg"/>
+</figure>
+
+<para>Pada contoh di atas, client meminta sebuah file bernama <filename>index.htm</filename>.
+Karena tidak ada content-type untuk file dengan ekstensi .htm, maka content-type default, yaitu 
+text/plain, akan digunakan. File <filename>index.htm</filename> akan dianggap sebagai file
+teks biasa.</para>
+</listitem>
+
+<listitem><para>Request: http://localhost:29182/gambar/gambar.png</para>
+<figure>
+	<title>Gambar</title>
+	<graphic fileref="img/gambar.png.jpg"/>
+</figure>
+
+<para>Pada contoh di atas, server berhasil mengirimkan sebuah gambar dengan isi dan
+content-type yang tepat sehingga browser dapat menampilkan gambar tersebut dengan benar.</para>
+</listitem>
+
+<listitem><para>Request: http://localhost:29182/tidak_ada</para>
+<figure>
+	<title>Not Found</title>
+	<graphic fileref="img/tidak_ada.jpg"/>
+</figure>
+
+<para>Pada contoh di atas, client meminta sebuah file yang tidak valid. Server mengembalikan
+response <literal>404</literal> ke client.</para>
+</listitem>
+
+<listitem><para>Request: http//localhost:29182/cgi-bin/adder.sh?29385&amp;29182</para>
+<figure>
+	<title>Dynamic Content</title>
+	<graphic fileref="img/adder.sh.jpg"/>
+</figure>
+
+<para>Pada contoh di atas, server menjalankan program <filename>adder.sh</filename>
+dan mengirimkan output program ke client sehingga dapat ditampilkan pada browser.</para>
+</listitem>
+
+<listitem><para>Request: http://localhost:29182/phpinfo.php</para>
+<figure>
+	<title>Dynamic Content 2</title>
+	<graphic fileref="img/phpinfo.php.jpg"/>
+</figure>
+
+<para>Pada contoh di atas, client meminta file yang mengharuskan server menjalankan
+program tertentu. Dalam contoh ini, program <application>PHP</application> akan
+dijalankan oleh server.</para>
+</listitem>
+</orderedlist>
+
+	</chapter>
+	
+	<chapter id="referensi">
+		<title>Referensi</title>
+	
+<para>Referensi yang kami gunakan dalam mengerjakan tugas 3 kuliah Jaringan Komputer
+ini adalah:
+<orderedlist>
+<listitem><para>RFC 2616 (HTTP 1.1)</para></listitem>
+<listitem><para>Source code Apache/1.3.27 (<ulink url="http://httpd.apache.org">http://httpd.apache.org</ulink>)</para></listitem>
+<listitem><para>Source code jbdhttpd/0.1.0 (<ulink url="http://tinyhtttpd.sourceforge.net">http://tinyhtttpd.sourceforge.net</ulink>)</para></listitem>
+<listitem><para>Source code Null httpd 0.5.1</para></listitem>
+<listitem><para>Beej's Guide to Network Programming</para></listitem>
+</orderedlist>
+
+dan sumber-sumber lain yang kami temukan.
+</para>
+
+	</chapter>
+	
+	<appendix id="file_konfigurasi">
+		<title>File Konfigurasi</title>
+	
+<para>Server yang kami buat dapat dikonfigurasi melalui sebuah file konfigurasi
+<filename>conf/konta-httpd.conf</filename>. Setiap konfigurasi suatu bagian tertentu ditulis dalam
+satu baris. Setiap baris konfigurasi memiliki format sebagai berikut:
+
+<screen>
+Nama Nilai
+</screen>
+</para>
+
+<para><varname>Nama</varname> menentukan hal yang ingin dikonfigurasi. <varname>Nilai</varname> adalah nilai dari hal 
+tersebut.</para>
+
+<para>Daftar hal-hal yang dapat dikonfigurasi adalah:
+<orderedlist>
+<listitem><para><varname>ServerPort</varname></para>
+   <para>Menentukan port dari server</para>
+   
+   <para>Format:
+   
+<screen>
+<varname>ServerPort</varname> port
+</screen>
+   </para>
+   
+   <para>Contoh:
+   
+<screen>
+<varname>ServerPort</varname> 8000
+</screen>
+   </para>
+</listitem>
+
+<listitem><para><varname>DocumentRoot</varname></para>
+   <para>Direktori yang dimasukkan akan menjadi direktori teratas pada Request URI.</para>
+   
+   <para>Format:
+   
+<screen>
+<varname>DocumentRoot</varname> /path/menuju/sebuah/direktori
+</screen>
+   </para>
+   
+   <para>Contoh:
+   
+<screen>
+<varname>DocumentRoot</varname> /var/www/html
+</screen>
+   </para>
+</listitem>
+
+<listitem><para><varname>DirectoryIndex</varname></para>
+   Menentukan file-file apa saja yang dapat menjadi indeks sebuah direktori
+   
+   <para>Format:
+   
+<screen>
+<varname>DirectoryIndex</varname> file1 file2 ...
+</screen>
+   </para>
+   
+   <para>Contoh:
+   
+<screen>
+<varname>DirectoryIndex</varname> index.html index.htm index.php
+</screen>
+   </para>
+</listitem>
+
+<listitem><para><varname>AddType</varname></para>
+   Menambahkan tipe sebuah file tertentu berdasarkan ekstensinya.
+   
+   <para>Format:
+   
+<screen>
+<varname>AddType</varname> content/type .ekstensi
+</screen>
+   </para>
+   
+   <para>Contoh:
+   
+<screen>
+<varname>AddType</varname> text/html .html
+<varname>AddType</varname> text/html .htm
+<varname>AddType</varname> application/x-httpd-php .php
+</screen>
+   </para>
+</listitem>
+
+<listitem><para><varname>DefaultType</varname></para>
+   Mengatur tipe yang akan dikirim jika tipe untuk file tertentu tidak 
+   ditemukan.
+   
+   <para>Format:
+   
+<screen>
+<varname>DefaultType</varname> content/type
+</screen>
+	</para>
+   
+   <para>Contoh:
+   
+<screen>
+<varname>DefaultType</varname> text/plain
+</screen>
+   </para>
+</listitem>
+
+<listitem><para><varname>Action</varname></para>
+   Mengatur program yang akan dipanggil jika client meminta file dengan tipe
+   tertentu
+   
+   <para>Format:
+   
+<screen>
+<varname>Action</varname> content/type /path/menuju/sebuah/program
+</screen>
+   </para>
+   
+   <para>Contoh:
+
+<screen>
+<varname>Action</varname> application/x-httpd-php /usr/bin/php
+</screen>
+   </para>
+</listitem>
+
+<listitem><para><varname>ScriptAlias</varname></para>
+   Mengatur direktori virtual yang akan dijadikan sebagai tempat meletakkan
+   program-program yang dapat dipanggil.
+   
+   <para>Format:
+   
+<screen>
+<varname>ScriptAlias</varname> /direktori-virtual/ /path/menuju/direktori/sebenarnya/
+</screen>
+   </para>
+   
+   <para>Contoh:
+   
+<screen>
+<varname>ScriptAlias</varname> /cgi-bin/ /var/www/cgi-bin/
+</screen>
+   </para>
+</listitem>
+
+<listitem><para><varname>ServerRoot</varname></para>
+   Mengatur direktori utama server berada. Jika direktori pada ScriptAlias dan
+   DocumentRoot merupakan direktori relatif (tidak menggunakan / pada awal
+   direktori), maka direktori server ini akan ditambahkan pada awal direktori
+   ScriptAlias atau DocumentRoot tersebut.
+   
+   <para>Format:
+   
+<screen>
+<varname>ServerRoot</varname> /path/menuju/sebuah/direktori/
+</screen>
+   </para>
+   
+   <para>Contoh:
+   
+<screen>
+<varname>ServerRoot</varname> /usr/local/konta-httpd/
+</screen>
+   </para>
+</listitem>
+</orderedlist>
+</para>
+   	
+		<section id="contoh_file_konfigurasi">
+			<title>Contoh file konfigurasi</title>
+			
+	<para>Contoh file konfigurasi:
+	
+<screen>
+# File konfigurasi Konta-HTTPd 
+
+# Cara penggunaan:
+# 1. Gunakan tanda pagar pada awal baris untuk membuat komentar
+# 2. Pisahkan kata/token dengan 1 spasi
+
+# Port yang dipakai oleh server
+ServerPort 8000
+
+# Direktori tempat dokumen html berada
+DocumentRoot htdocs/
+
+# Nama file yang dicari jika client me-request sebuah direktori
+DirectoryIndex index.html index.htm index.php
+
+# Tambahkan Content-Type
+AddType text/plain .txt
+AddType text/html .html
+AddType text/html .htm
+AddType text/css .css
+AddType image/jpeg .jpg
+AddType image/jpeg .jpeg
+AddType image/gif .gif
+AddType image/png .png
+AddType application/x-httpd-php .php
+AddType application/x-httpd-sh .sh
+
+# Content-Type default jika tidak ada yang cocok
+DefaultType text/plain
+
+# Handler untuk tipe file tertentu
+Action application/x-httpd-php /usr/lib/cgi-bin/php4
+Action application/x-httpd-sh /bin/sh
+
+# Script Alias
+ScriptAlias /cgi-bin/ cgi-bin/
+</screen>
+	
+	</para>
+		</section>
+	
+	</appendix>
+	
+</book>

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><title>Bab 1. Penjelasan Program</title><meta name="generator" content="DocBook XSL Stylesheets V1.62.0" /><link rel="home" href="index.html" title="Dokumentasi Tugas 3 Kelompok Konta" /><link rel="up" href="index.html" title="Dokumentasi Tugas 3 Kelompok Konta" /><link rel="previous" href="index.html" title="Dokumentasi Tugas 3 Kelompok Konta" /><link rel="next" href="http_response.html" title="HTTP Response" /></head><link rel="stylesheet" type="text/css" href="style.css" /><body><div id="header"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">Bab 1. Penjelasan Program</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="index.html">Kembali</a></td><th width="60%" align="center"></th><td width="20%" align="right"><a accesskey="n" href="http_response.html">Lanjut</a></td></tr></table></div></div><div id="content"><div class="chapter" lang="id" xml:lang="id"><div class="titlepage"><div><div><h2 class="title"><a id="penjelasan_program"></a>Bab 1. Penjelasan Program</h2></div></div><div></div></div><div class="toc"><p><b>Daftar Isi</b></p><dl><dt><span class="section"><a href="penjelasan_program.html#http_request">HTTP Request</a></span></dt><dt><span class="section"><a href="http_response.html">HTTP Response</a></span></dt><dt><span class="section"><a href="cara_kerja_server.html">Cara kerja Server</a></span></dt><dt><span class="section"><a href="fungsi_umum.html">Fungsi-fungsi umum</a></span></dt><dt><span class="section"><a href="pengiriman_file.html">Pengiriman file ke client</a></span></dt><dt><span class="section"><a href="daftar_isi_direktori.html">Pembuatan daftar isi direktori</a></span></dt><dt><span class="section"><a href="dynamic_content.html">Dynamic Content</a></span></dt></dl></div><p>Program yang dibuat dalam tugas 3 kuliah Jaringan Komputer ini adalah sebuah
+program server yang bekerja pada protokol HTTP, atau biasa disebut Web Server.</p><p>Web Server akan menerima koneksi dari client dan akan memproses request yang
+dikirim oleh client (HTTP Request). Lalu server akan memproses request yang
+diberikan dan memberikan respon balik ke client (HTTP Response). Pada dasarnya 
+request dari client merupakan request yang meminta sebuah file yang ada pada 
+server, dan server akan mengirimkan file yang diminta kepada client. </p><div class="section" lang="id" xml:lang="id"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a id="http_request"></a>HTTP Request</h2></div></div><div></div></div><p>Setelah client melakukan koneksi dengan web server, client akan mengirimkan
+HTTP Request. HTTP Request ini terdiri dari tiga bagian, yaitu request line,
+header dan data. Sesuai dengan RFC 2616, request line memiliki format sebagai
+berikut:
+
+</p><pre class="screen">
+Request-Line   = Method SP Request-URI SP HTTP-Version CRLF
+</pre><p>
+</p><p>Contohnya adalah
+
+</p><pre class="screen">
+GET /index.html HTTP/1.0
+</pre><p>
+</p><p>Pada tugas kali ini, kami hanya akan memperhatikan request yang memiliki 
+Method GET. Untuk method-method lainnya akan diabaikan dan mengirim pesan
+error kepada client. Bagian lain dari HTTP Request, yaitu header dan data, juga 
+akan diabaikan.</p></div></div></div><div id="footer"><div class="navfooter"><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="index.html">Kembali</a></td><td width="20%" align="center"><a accesskey="u" href="index.html">Induk</a></td><td width="40%" align="right"><a accesskey="n" href="http_response.html">Lanjut</a></td></tr><tr><td width="40%" align="left" valign="top">Dokumentasi Tugas 3 Kelompok Konta</td><td width="20%" align="center"><a accesskey="h" href="index.html">Depan</a></td><td width="40%" align="right" valign="top">HTTP Response</td></tr></table></div></div></body></html>
